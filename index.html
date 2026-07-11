@@ -298,6 +298,11 @@
             <h4 style="font-size:1rem;margin-bottom:4px;">Sintesi personale</h4>
             <p id="personalSummary" style="color:var(--muted);font-size:.9rem;line-height:1.65;">—</p>
           </div>
+          <div class="info-card" style="margin-bottom:10px;">
+            <div class="k">Significato del nome</div>
+            <div class="v" id="nameMeaningProfilo" style="font-size:1rem;font-weight:700;margin-top:4px;">—</div>
+            <div class="s" id="nameMeaningProfiloHint">Compare anche nella scheda Luna &amp; Eventi</div>
+          </div>
           <div class="cards-2">
             <div class="info-card"><div class="k">Giorno settimana</div><div class="v" id="r_weekday">—</div><div class="s" id="r_weekday_note">—</div></div>
             <div class="info-card"><div class="k">Segno occidentale</div><div class="v" id="r_zodiac">—</div><div class="s" id="r_zodiac_traits">—</div></div>
@@ -2103,7 +2108,13 @@ function render(){
   document.getElementById('r_planet_desc').textContent = `Reggente di ${r.zodiac.name}`;
   document.getElementById('eventDateLabel').textContent = `${r.day}/${r.month}`;
   const evEl = document.getElementById('eventList'); evEl.innerHTML=''; getEventsFor(r.day, r.month).forEach(ev=>{ const li=document.createElement('li'); li.textContent=ev; evEl.appendChild(li); });
-  document.getElementById('nameMeaning').textContent = r.nameMeaning ? `${r.name.split(' ')[0]}: ${r.nameMeaning}` : `Significato di "${r.name.split(' ')[0]}" non ancora disponibile.`;
+  const nmText = r.nameMeaning
+    ? `${r.name.split(' ')[0]}: ${r.nameMeaning}`
+    : `Significato di "${r.name.split(' ')[0]}" non trovato nel dizionario locale.`;
+  const nmEl = document.getElementById('nameMeaning');
+  if (nmEl) nmEl.textContent = nmText;
+  const nmEl2 = document.getElementById('nameMeaningProfilo');
+  if (nmEl2) nmEl2.textContent = r.nameMeaning ? r.nameMeaning : `Non trovato per "${r.name.split(' ')[0]}"`;
 
   drawNatalWheel(r.planetDetails || r.planets);
   renderNatalTable(r.planetDetails || r.planets);
@@ -2623,49 +2634,76 @@ function initTranslateUi() {
   );
 }
 
+function normalizeNameKey(name) {
+  return String(name || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // toglie accenti: Nicolò → nicolo
+    .replace(/[^a-z0-9' ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function lookupLocalNameMeaning(name) {
+  const raw = String(name || '').trim();
+  if (!raw) return null;
+  const candidates = [];
+  const lower = raw.toLowerCase();
+  const norm = normalizeNameKey(raw);
+  const first = lower.split(/\s+/)[0];
+  const firstNorm = normalizeNameKey(first);
+  candidates.push(lower, norm, first, firstNorm);
+  // prova anche senza apostrofi
+  candidates.push(firstNorm.replace(/'/g, ''), norm.replace(/'/g, ''));
+  for (const c of candidates) {
+    if (c && NAME_MEANINGS[c]) return NAME_MEANINGS[c];
+  }
+  // ricerca senza accenti sulle chiavi del dizionario
+  if (firstNorm) {
+    for (const [k, v] of Object.entries(NAME_MEANINGS)) {
+      if (normalizeNameKey(k) === firstNorm) return v;
+    }
+  }
+  return null;
+}
+
 async function fetchNameMeaning(name) {
-  const key = name.toLowerCase().trim();
+  const key = normalizeNameKey(name).split(/\s+/)[0] || name.toLowerCase().trim();
   if (!key) return null;
 
   // 1. Cache
   const cached = getCachedNameMeaning(key);
   if (cached) return cached;
 
-  // 2. Dizionario locale (già italiano)
-  if (NAME_MEANINGS[key]) {
-    const meaning = NAME_MEANINGS[key];
-    saveNameMeaningToCache(key, meaning);
-    return meaning;
+  // 2. Dizionario locale (già italiano) – match robusto
+  const local = lookupLocalNameMeaning(name);
+  if (local) {
+    saveNameMeaningToCache(key, local);
+    return local;
   }
 
   let meaning = null;
-  let source = null;
 
-  // 3. Backend proxy (locale con avvia.bat): NameAPI + traduzione server-side
+  // 3. Backend proxy (locale / Render): NameAPI + traduzione server-side
   const backendUrl = backendBaseUrl();
   const userApiKey = getUserApiKey();
   if (backendUrl) {
     try {
-      const qs = new URLSearchParams({ name });
+      const qs = new URLSearchParams({ name: name.trim() });
       if (userApiKey) qs.set('apiKey', userApiKey);
       qs.set('translate', isTranslateEnabled() ? '1' : '0');
       const res = await fetch(`${backendUrl}/api/name-meaning?${qs.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.meaning) {
-          meaning = data.meaning;
-          source = data.source || 'backend';
-        }
+        if (data.meaning) meaning = data.meaning;
       }
     } catch (e) {
       console.warn('Backend name-meaning non disponibile:', e);
     }
   }
 
-  // 4. Se ancora niente e abbiamo testo grezzo da tradurre: nient'altro da NameAPI
-  //    lato browser (CORS). Su GitHub Pages restano dizionario + eventuale cache.
-
-  // 5. Traduzione client-side se il testo sembra inglese (GitHub Pages friendly)
+  // 4. Traduzione client-side se il testo sembra inglese
   if (meaning) {
     const translated = await translateToItalian(meaning);
     if (translated) meaning = translated;

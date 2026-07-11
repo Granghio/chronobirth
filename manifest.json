@@ -1,0 +1,62 @@
+{
+  "name": "ChronoBirth - Profilo astrologico di nascita",
+  "short_name": "ChronoBirth",
+  "description": "Profilo astrologico di nascita con ascendente calcolato da ora, luogo, coordinate e fuso orario. Compatibilità, numerologia e tema natale.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d0a1a",
+  "theme_color": "#6d28d9",
+  "lang": "it",
+  "dir": "ltr",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "icons/generated/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/generated/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/generated/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/generated/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/generated/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Nuovo profilo",
+      "short_name": "Profilo",
+      "description": "Crea un nuovo profilo di nascita",
+      "url": "./index.html#name",
+      "icons": [
+        {
+          "src": "icons/generated/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

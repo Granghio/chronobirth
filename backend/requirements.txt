@@ -1,0 +1,10 @@
+# Dipendenze minime (funzionano su Windows SENZA Visual C++)
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+httpx>=0.27.0
+python-multipart>=0.0.9
+
+# Opzionale: Swiss Ephemeris ufficiale (richiede compilatore C++ su Windows)
+# Installa solo se hai "Microsoft C++ Build Tools":
+#   pip install pyswisseph
+# pyswisseph>=2.10.3.2

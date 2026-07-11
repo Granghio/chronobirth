@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>ChronoBirth - Profilo astrologico di nascita</title>
+  <meta name="theme-color" content="#6d28d9" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#6d28d9" media="(prefers-color-scheme: light)">
+  <meta name="description" content="Profilo astrologico di nascita con ascendente calcolato da ora, luogo, coordinate e fuso orario.">
+  <meta name="application-name" content="ChronoBirth">
+  <!-- PWA / installabilità -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ChronoBirth">
+  <meta name="msapplication-TileColor" content="#6d28d9">
+  <meta name="msapplication-TileImage" content="icons/generated/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <!-- Icone e favicon -->
+  <link rel="apple-touch-icon" href="icons/generated/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="icons/generated/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/generated/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/generated/icon-512.png">
+  <link rel="icon" type="image/x-icon" href="icons/generated/favicon.ico">
+  <style>
+    :root{--bg:#0d0a1a;--bg-2:#16102c;--card:#1c1536f2;--card-2:#241c42;--text:#f2efff;--muted:#b8add8;--primary:#8b5cf6;--primary-2:#a78bfa;--accent:#22d3ee;--pink:#f472b6;--green:#34d399;--yellow:#fbbf24;--red:#fb7185;--border:rgba(255,255,255,0.09);--shadow:0 20px 60px rgba(0,0,0,0.45);--radius:20px;--touch-size:48px}
+    @media(prefers-color-scheme:light){:root{--bg:#f5f2ff;--bg-2:#ebe6ff;--card:#fffffffb;--card-2:#f7f4ff;--text:#1b1333;--muted:#5d5380;--border:rgba(60,30,120,.12);--shadow:0 20px 40px rgba(96,70,180,.11)}}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 800px at 15% -10%,#3a2468 0%,transparent 60%),radial-gradient(1000px 700px at 110% 5%,#0a5b6b 0%,transparent 50%),var(--bg);color:var(--text);min-height:100vh;line-height:1.55}
+    .wrap{max-width:1180px;margin:0 auto;padding:16px 12px 100px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 8px 24px rgba(139,92,246,.35)}
+    .brand h1{font-size:1.2rem;font-weight:800;letter-spacing:-.015em}
+    .brand p{color:var(--muted);font-size:.75rem}
+    .top-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .btn-ghost{background:var(--card-2);color:var(--text);border:1px solid var(--border);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.8rem;min-height:var(--touch-size);display:flex;align-items:center;gap:4px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+    @media(min-width:980px){.grid{grid-template-columns:370px 1fr}}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.032),rgba(255,255,255,.014));background-color:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;backdrop-filter:blur(14px)}
+    .panel h2{font-size:1rem;margin-bottom:10px}
+    label{display:block;font-weight:600;font-size:.8rem;color:var(--muted);margin-bottom:4px}
+    input,select{width:100%;padding:14px 14px;border-radius:12px;border:1.5px solid var(--border);background:#0f0c20;color:var(--text);font-size:.95rem;outline:none;min-height:var(--touch-size)}
+    @media(prefers-color-scheme:light){input,select{background:#f6f3ff;color:#1b1333}}
+    input:focus,select:focus{border-color:var(--primary-2);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{margin-bottom:10px}
+    .btn-primary{width:100%;padding:16px;border:none;border-radius:13px;background:linear-gradient(90deg,#7c3aed,#22d3ee);color:#fff;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 12px 30px rgba(124,58,237,.3);transition:transform .12s;min-height:var(--touch-size)}
+    .btn-primary:hover{transform:translateY(-2px)}
+    .hint{color:var(--muted);font-size:.75rem;margin-top:4px}
+    hr.sep{border:none;border-top:1px solid var(--border);margin:14px 0}
+    .profiles-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto}
+    .profile-chip{display:flex;align-items:center;justify-content:space-between;background:var(--card-2);border:1px solid var(--border);padding:10px 12px;border-radius:12px;cursor:pointer;gap:6px;flex-wrap:wrap}
+    .profile-chip.active{border-color:var(--primary-2)}
+    .profile-chip small{color:var(--muted)}
+    .profile-chip .actions{display:flex;gap:4px}
+    .profile-chip .del,.profile-chip .edit{background:none;border:none;color:#ff8a8a;cursor:pointer;font-size:1.1rem;padding:4px 6px;border-radius:8px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+    .profile-chip .edit{color:var(--accent)}
+    .tag{font-size:.7rem;background:rgba(139,92,246,.18);color:#d8c7ff;padding:4px 10px;border-radius:999px;font-weight:700}
+    .result-empty{min-height:320px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);border:2px dashed var(--border);border-radius:16px;padding:20px}
+    .result-wrap{display:none}
+    .result-wrap.show{display:block;animation:fadeUp .3s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .tabs{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 14px}
+    .tab-btn{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card-2);color:var(--muted);font-weight:700;font-size:.8rem;cursor:pointer;min-height:var(--touch-size)}
+    .tab-btn.active{background:linear-gradient(90deg,#7c3aed44,#22d3ee33);color:var(--text);border-color:#a78bfa77}
+    .tab-pane{display:none}
+    .tab-pane.active{display:block;animation:fadeUp .2s ease}
+    .hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(34,211,238,.11));border:1px solid var(--border);padding:16px;border-radius:16px;margin-bottom:12px}
+    .hero h3{font-size:1.3rem;margin-bottom:2px}
+    .hero .sub{color:var(--muted);font-size:.85rem}
+    .avatar{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 28px rgba(124,58,237,.35)}
+    .cards-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:620px){.cards-2{grid-template-columns:1fr}}
+    .info-card{background:var(--card-2);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .info-card .k{text-transform:uppercase;font-size:.7rem;letter-spacing:.07em;color:var(--muted);font-weight:700}
+    .info-card .v{font-size:1.2rem;font-weight:800;margin-top:4px}
+    .info-card .s{color:var(--muted);font-size:.8rem;margin-top:2px}
+    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+    .stat{background:var(--card-2);border:1px solid var(--border);border-radius:13px;padding:12px}
+    .stat .l{font-size:.7rem;color:var(--muted)}
+    .stat .n{font-size:1rem;font-weight:800}
+    .block{margin-top:14px}
+    .block h4{margin-bottom:7px;font-size:.95rem}
+    .pills{display:flex;flex-wrap:wrap;gap:6px}
+    .pill{background:#140f2b;border:1px solid var(--border);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:.75rem}
+    @media(prefers-color-scheme:light){.pill{background:#f0eaff}}
+    .timeline{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px}
+    .timeline .d{text-align:center;background:var(--card-2);border:1px solid var(--border);border-radius:10px;padding:8px 2px;font-size:.75rem;color:var(--muted)}
+    .timeline .d strong{display:block;color:var(--text);font-size:.9rem}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .btn{padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card-2);color:var(--text);font-weight:700;cursor:pointer;font-size:.8rem;min-height:var(--touch-size);display:inline-flex;align-items:center;gap:4px;flex:1 1 auto;justify-content:center}
+    .btn:hover{border-color:#ffffff30}
+    .small{font-size:.8rem;color:var(--muted)}
+    .trust-box{background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.22);border-radius:14px;padding:12px;color:var(--muted);font-size:.8rem;line-height:1.55}
+    .trust-box strong{color:var(--text)}
+    .compat-box{background:var(--card-2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:10px}
+    .compat-bar{height:10px;background:#0d0a1c;border-radius:999px;overflow:hidden;margin:7px 0}
+    .compat-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#22d3ee);border-radius:999px}
+    .compat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+    .cstat{background:#171230;border-radius:10px;padding:10px;text-align:center;font-size:.8rem}
+    .cstat strong{display:block;font-size:1rem}
+    .matrix{width:100%;border-collapse:collapse;font-size:.7rem;margin-top:8px}
+    .matrix th,.matrix td{border:1px solid var(--border);padding:4px 2px;text-align:center}
+    .matrix th{background:var(--card-2);position:sticky;top:0}
+    .good{background:rgba(52,211,153,.13)}
+    .mid{background:rgba(251,191,36,.10)}
+    .bad{background:rgba(251,113,133,.10)}
+    .natal-wrap{display:grid;grid-template-columns:1fr;gap:16px;align-items:center}
+    @media(min-width:700px){.natal-wrap{grid-template-columns:260px 1fr}}
+    .natal-svg{background:#120d25;border:1px solid var(--border);border-radius:14px;width:100%;height:auto;aspect-ratio:1/1}
+    .natal-table{width:100%;border-collapse:collapse;font-size:.8rem}
+    .natal-table td{padding:6px 8px;border-bottom:1px solid var(--border)}
+    .natal-table td:first-child{color:var(--muted)}
+    .rank-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+    .rank-item{display:flex;justify-content:space-between;align-items:center;background:var(--card-2);border:1px solid var(--border);padding:8px 12px;border-radius:11px;font-size:.85rem}
+    .intro-panel{margin-bottom:16px;padding:16px;border-radius:var(--radius);border:1px solid var(--border);background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(34,211,238,.08));display:grid;grid-template-columns:1fr;gap:12px;align-items:center}
+    .intro-panel h2{font-size:1.2rem;letter-spacing:-.02em;margin-bottom:4px}
+    .intro-panel p{color:var(--muted);max-width:720px;font-size:.9rem}
+    .intro-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .intro-badge{padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--border);font-size:.75rem;font-weight:700;color:var(--text)}
+    .intro-cta{display:flex;flex-direction:row;gap:8px;flex-wrap:wrap}
+    .btn-mini{padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card-2);color:var(--text);font-weight:800;cursor:pointer;text-align:center;flex:1;min-height:var(--touch-size)}
+    .btn-mini.primary{background:linear-gradient(90deg,#7c3aed,#22d3ee);border:none;color:#fff}
+    .location-details{margin-top:6px;background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.22);border-radius:12px;padding:8px 10px;color:var(--muted);font-size:.75rem;line-height:1.5}
+    .bottom-nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:50;display:flex;gap:4px;background:rgba(18,13,37,.86);border:1px solid var(--border);backdrop-filter:blur(14px);box-shadow:0 12px 40px rgba(0,0,0,.35);border-radius:999px;padding:6px 8px}
+    .bottom-nav button{border:none;background:transparent;color:var(--muted);font-size:.7rem;font-weight:800;padding:8px 12px;border-radius:999px;cursor:pointer;min-height:var(--touch-size)}
+    .bottom-nav button.active,.bottom-nav button:hover{background:rgba(139,92,246,.24);color:var(--text)}
+    @media(min-width:760px){.bottom-nav{display:none}}
+    @media print{header,.grid>div:first-child,.tabs,.tab-pane:not(.active),.actions,.footer-note{display:none!important}body{background:#fff;color:#111}.panel{box-shadow:none;border:none}.grid{grid-template-columns:1fr}}
+    .flex{display:flex;gap:8px;flex-wrap:wrap}
+    .api-key-field{background:rgba(34,211,238,.05);border:1px solid rgba(34,211,238,.15);border-radius:12px;padding:12px;margin-top:8px}
+    .api-key-field .hint a{color:var(--accent);text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="brand-logo">🌌</div>
+      <div><h1>ChronoBirth</h1><p>Profilo astrologico • Ascendente • Compatibilità</p></div>
+    </div>
+    <div class="top-actions">
+      <button class="btn-ghost" id="btnExport">📥 Export</button>
+      <button class="btn-ghost" id="btnPrint">🖨️ PDF</button>
+      <button class="btn-ghost" id="btnInstall" style="display:none">📲 Installa</button>
+    </div>
+  </header>
+
+  <section class="intro-panel">
+    <div>
+      <h2>Scopri il tuo profilo astrologico</h2>
+      <p>Calcola segno, ascendente, numerologia e compatibilità usando il luogo reale di nascita.</p>
+      <div class="intro-badges">
+        <span class="intro-badge">🌙 Luna & simboli</span>
+        <span class="intro-badge">💞 Compatibilità</span>
+        <span class="intro-badge">🔒 Dati locali</span>
+      </div>
+    </div>
+    <div class="intro-cta">
+      <button class="btn-mini primary" id="btnStart">Inizia ora</button>
+      <button class="btn-mini" id="btnGoCompat">Compatibilità</button>
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- COLONNA SINISTRA -->
+    <div class="panel">
+      <h2>Nuovo profilo</h2>
+      <div class="field"><label>Nome</label><input id="name" placeholder="Es. Giulia"></div>
+      <div class="row">
+        <div class="field"><label>Data di nascita</label><input type="date" id="birthdate"></div>
+        <div class="field"><label>Ora</label><input type="time" id="birthtime"></div>
+      </div>
+      <div class="field">
+        <label>Luogo di nascita</label>
+        <div class="flex"><input id="place" placeholder="Es. Roma, Italia" style="flex:1"><button class="btn" id="btnSearchPlace">Cerca</button></div>
+        <div class="hint" id="t_timehint">Inserisci città e nazione, poi premi Cerca.</div>
+        <div id="placeResults" class="place-results" style="display:none;flex-direction:column;gap:6px;margin-top:6px;"></div>
+        <div id="locationDetails" class="location-details" style="display:none;"></div>
+      </div>
+      <button class="btn-primary" id="btnCalc">Calcola profilo completo →</button>
+      <p class="hint">Offline • LocalStorage • PWA</p>
+      <div class="api-key-field" id="backendStatusBox" style="margin-top:10px;">
+        <h2>🪐 Motore di calcolo</h2>
+        <p class="small" id="backendStatus">Controllo backend Swiss Ephemeris…</p>
+        <div class="flex" style="margin-top:8px;">
+          <input id="backendUrlInput" placeholder="URL backend (vuoto = stesso sito)" style="flex:1">
+          <button class="btn" id="btnSaveBackendUrl" type="button">💾</button>
+          <button class="btn" id="btnCheckBackend" type="button">↻</button>
+        </div>
+        <p class="small" style="margin-top:4px;font-style:italic;">
+          Se il backend non risponde, l’app usa il fallback astronomico nel browser.
+        </p>
+      </div>
+      <hr class="sep">
+
+      <!-- 🔑 GESTIONE CHIAVE API NAMEAPI -->
+      <div class="api-key-field">
+        <h2>🔑 Chiave API NameAPI (opzionale)</h2>
+        <p class="small">
+          Inserisci la tua chiave NameAPI per ottenere significati più ricchi per i nomi.
+          <br>
+          <a href="https://www.nameapi.org/" target="_blank" style="color:var(--accent);">Come ottenere una chiave gratuita</a>
+          <br>
+          <span style="opacity:.85">Su GitHub Pages NameAPI funziona solo se il backend la espone; in locale usa <code>avvia.bat</code>.</span>
+        </p>
+        <div class="flex">
+          <input id="nameApiKey" placeholder="Inserisci la tua chiave API" style="flex:1">
+          <button class="btn" id="btnSaveApiKey">💾 Salva</button>
+        </div>
+        <p class="small" id="apiKeyStatus" style="margin-top:4px;">Non configurata.</p>
+        <p class="small" style="margin-top:4px;font-style:italic;">
+          Se non inserisci una chiave, l'app usa il dizionario locale con oltre 1213 nomi.
+        </p>
+      </div>
+      <div class="api-key-field" style="margin-top:10px;">
+        <h2>🌐 Traduttore open source (EN → IT)</h2>
+        <p class="small">
+          Se NameAPI (o altre fonti) restituiscono il significato in inglese, lo traduco in italiano.
+          Funziona anche su <strong>GitHub Pages</strong> (senza Python).
+          <br>
+          Preferito: <a href="https://github.com/LibreTranslate/LibreTranslate" target="_blank" style="color:var(--accent);">LibreTranslate</a>
+          · fallback: MyMemory (gratis)
+        </p>
+        <label class="small" style="display:flex;align-items:center;gap:8px;margin:8px 0;cursor:pointer;">
+          <input type="checkbox" id="translateEnabled" checked style="width:auto;min-height:auto;">
+          Traduci automaticamente i significati in italiano
+        </label>
+        <div class="flex">
+          <input id="libreTranslateUrl" placeholder="URL LibreTranslate (vuoto = automatico)" style="flex:1">
+          <button class="btn" id="btnSaveTranslate" type="button">💾</button>
+          <button class="btn" id="btnTestTranslate" type="button">↻</button>
+        </div>
+        <p class="small" id="translateStatus" style="margin-top:4px;">Traduzione attiva (fallback automatico).</p>
+      </div>
+      <hr class="sep">
+
+      <h2>Profili salvati <span class="tag" id="profileCount">0</span></h2>
+      <div class="profiles-list" id="profilesList"></div>
+      <div class="actions">
+        <button class="btn" id="btnClearAll">🗑️ Svuota</button>
+        <button class="btn" id="btnImport">📂 Importa</button>
+        <input type="file" id="fileImport" accept=".json" style="display:none">
+      </div>
+      <hr class="sep">
+
+      <h2>Privacy & trasparenza</h2>
+      <div class="trust-box">
+        <strong>Dati locali:</strong> i profili restano nel browser tramite LocalStorage.<br>
+        <strong>Luogo corretto:</strong> usa la città in cui sei nato, non la posizione attuale.<br>
+        <strong>Nota:</strong> le interpretazioni astrologiche non sostituiscono consulenze professionali.
+      </div>
+      <hr class="sep">
+
+      <h2 id="t_compat">Compatibilità rapida</h2>
+      <div class="row">
+        <div class="field"><label>A</label><select id="compatA"></select></div>
+        <div class="field"><label>B</label><select id="compatB"></select></div>
+      </div>
+      <button class="btn" id="btnCompat" style="width:100%">💞 Calcola sinastria</button>
+      <div id="compatOut"></div>
+      <div id="matchmakerOut" style="margin-top:10px"></div>
+      <hr class="sep">
+
+      <h2>📅 Calendario compleanni</h2>
+      <div id="birthdayCalendar" class="small"></div>
+      <button class="btn" id="btnNotify" style="width:100%;margin-top:8px;">🔔 Attiva promemoria</button>
+    </div>
+
+    <!-- COLONNA DESTRA -->
+    <div class="panel">
+      <div id="emptyState" class="result-empty">
+        <div>
+          <div style="font-size:2.4rem;margin-bottom:4px">📅✨🌙</div>
+          <h2>Pronto a creare il tuo profilo?</h2>
+          <p>Inserisci nome, data, ora e luogo di nascita.</p>
+          <p class="small" style="margin-top:6px">Giorno, Zodiaco, Ascendente, Compatibilità</p>
+        </div>
+      </div>
+      <div id="resultWrap" class="result-wrap">
+        <div class="hero">
+          <div>
+            <div class="small" id="r_dateLong">—</div>
+            <h3 id="r_name">—</h3>
+            <div class="sub" id="r_subtitle">—</div>
+          </div>
+          <div class="avatar" id="r_avatar">♈</div>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="profilo">Profilo</button>
+          <button class="tab-btn" data-tab="tema">Tema</button>
+          <button class="tab-btn" data-tab="compat">Compatibilità</button>
+          <button class="tab-btn" data-tab="luna">Luna & Eventi</button>
+        </div>
+        <div class="tab-pane active" id="tab-profilo">
+          <div class="summary-card" style="background:linear-gradient(135deg,rgba(139,92,246,.14),rgba(244,114,182,.08));border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;">
+            <h4 style="font-size:1rem;margin-bottom:4px;">Sintesi personale</h4>
+            <p id="personalSummary" style="color:var(--muted);font-size:.9rem;line-height:1.65;">—</p>
+          </div>
+          <div class="cards-2">
+            <div class="info-card"><div class="k">Giorno settimana</div><div class="v" id="r_weekday">—</div><div class="s" id="r_weekday_note">—</div></div>
+            <div class="info-card"><div class="k">Segno occidentale</div><div class="v" id="r_zodiac">—</div><div class="s" id="r_zodiac_traits">—</div></div>
+            <div class="info-card"><div class="k">Zodiaco cinese</div><div class="v" id="r_chinese">—</div><div class="s" id="r_chinese_el">—</div></div>
+            <div class="info-card"><div class="k">Sole / Luna / Asc</div><div class="v" id="r_asc" style="font-size:1rem;">—</div><div class="s">Tema natale</div></div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat"><div class="l">Età esatta</div><div class="n" id="s_age">—</div></div>
+            <div class="stat"><div class="l">Giorni vissuti</div><div class="n" id="s_days">—</div></div>
+            <div class="stat"><div class="l">Prossimo compleanno</div><div class="n" id="s_next">—</div></div>
+            <div class="stat"><div class="l">Stagione</div><div class="n" id="s_season" style="font-size:1rem;">—</div></div>
+          </div>
+          <div class="block"><h4>Numerologia & Simboli</h4><div class="pills" id="symbols"></div></div>
+          <div class="block"><h4>Oroscopo personale di oggi</h4><p class="small" id="dailyHoroscope" style="font-style:italic"></p><div class="trust-box" id="dailyHoroscopeTech" style="margin-top:8px;"></div></div>
+          <div class="block"><h4>Frequenza compleanni per giorno</h4><div class="timeline" id="bdayTimeline"></div></div>
+          <div class="block"><h4>Timeline di vita</h4><p class="small" id="lifeStats"></p></div>
+        </div>
+        <div class="tab-pane" id="tab-tema">
+          <div class="natal-wrap">
+            <svg id="natalWheel" class="natal-svg" viewBox="0 0 260 260"></svg>
+            <div>
+              <h4>Ascendente e dati astrologici</h4>
+              <table class="natal-table" id="natalTable"></table>
+              <p class="small" style="margin-top:6px">Nota tecnica: se il backend è attivo, ascendente, case, Sole, Luna, pianeti e transiti vengono calcolati con Swiss Ephemeris. Altrimenti fallback astronomico browser.</p>
+              <div class="block"><h4>Transiti di oggi</h4><p class="small" id="transitsToday"></p></div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="tab-compat">
+          <div id="compatFullOut"></div>
+          <div id="compatRadarWrap" style="margin-top:10px"></div>
+          <div class="block"><h4>Classifica compatibilità con profili salvati</h4><div id="compatRanking" class="rank-list"></div></div>
+          <div class="block"><h4>Matrice compatibilità segni</h4><div style="overflow:auto;max-height:340px;border:1px solid var(--border);border-radius:12px"><table class="matrix" id="compatMatrix"></table></div></div>
+        </div>
+        <div class="tab-pane" id="tab-luna">
+          <div class="cards-2">
+            <div class="info-card"><div class="k">Fase lunare alla nascita</div><div class="v" id="moonPhase">—</div><div class="s" id="moonPhaseDesc">—</div></div>
+            <div class="info-card"><div class="k">Pianeta dominante</div><div class="v" id="r_planet" style="font-size:1.2rem;">—</div><div class="s" id="r_planet_desc">—</div></div>
+          </div>
+          <div class="block"><h4>Accadde il <span id="eventDateLabel">—</span></h4><ul id="eventList" style="margin-left:16px;color:var(--muted);font-size:.9rem;line-height:1.65;"></ul></div>
+          <div class="block"><h4>Significato del nome</h4><p class="small" id="nameMeaning">—</p></div>
+        </div>
+        <hr class="sep">
+        <div class="actions">
+          <button class="btn" id="btnShare">🔗 Condividi</button>
+          <button class="btn" id="btnWhats">💬 WhatsApp</button>
+          <button class="btn" id="btnCopy">📋 Copia</button>
+          <button class="btn" id="btnCard">🖼️ Card PNG</button>
+          <button class="btn" id="btnSaveProfile">💾 Salva</button>
+        </div>
+        <p class="small" id="saveHint" style="margin-top:6px;"></p>
+      </div>
+      <div class="footer-note" style="margin-top:16px;color:var(--muted);font-size:.75rem;text-align:center;">ChronoBirth • dati salvati sul dispositivo • ascendente da luogo, ora e fuso di nascita</div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button data-jump="homeIntro" class="active">Home</button>
+  <button data-jump="name">Profilo</button>
+  <button data-jump="t_compat">Match</button>
+  <button data-jump="birthdayCalendar">📅</button>
+</nav>
+
+<script>
+// ============================================================
+// CHRONOBIRTH – TUTTO IL JAVASCRIPT (COMPLETO)
+// ============================================================
+
+// ----- DATI ASTROLOGICI -----
+const ZODIAC = [
+  {name:"Capricorno", emoji:"♑", start:[12,22], end:[1,19], el:"Terra", mode:"Cardinale", planet:"Saturno", traits:"Ambizioso, disciplinato", stone:"Onice", color:"Marrone", flower:"Garofano", metal:"Piombo"},
+  {name:"Acquario", emoji:"♒", start:[1,20], end:[2,18], el:"Aria", mode:"Fisso", planet:"Urano", traits:"Innovativo, indipendente", stone:"Ametista", color:"Blu elettrico", flower:"Orchidea", metal:"Alluminio"},
+  {name:"Pesci", emoji:"♓", start:[2,19], end:[3,20], el:"Acqua", mode:"Mobile", planet:"Nettuno", traits:"Empatico, sognatore", stone:"Acquamarina", color:"Verde mare", flower:"Ninfea", metal:"Stagno"},
+  {name:"Ariete", emoji:"♈", start:[3,21], end:[4,19], el:"Fuoco", mode:"Cardinale", planet:"Marte", traits:"Coraggioso, pionieristico", stone:"Diamante", color:"Rosso", flower:"Caprifoglio", metal:"Ferro"},
+  {name:"Toro", emoji:"♉", start:[4,20], end:[5,20], el:"Terra", mode:"Fisso", planet:"Venere", traits:"Affidabile, sensuale", stone:"Smeraldo", color:"Verde", flower:"Rosa", metal:"Rame"},
+  {name:"Gemelli", emoji:"♊", start:[5,21], end:[6,20], el:"Aria", mode:"Mobile", planet:"Mercurio", traits:"Curioso, versatile", stone:"Agata", color:"Giallo", flower:"Lavanda", metal:"Mercurio"},
+  {name:"Cancro", emoji:"♋", start:[6,21], end:[7,22], el:"Acqua", mode:"Cardinale", planet:"Luna", traits:"Protettivo, intuitivo", stone:"Perla", color:"Argento", flower:"Giglio", metal:"Argento"},
+  {name:"Leone", emoji:"♌", start:[7,23], end:[8,22], el:"Fuoco", mode:"Fisso", planet:"Sole", traits:"Carismatico, generoso", stone:"Rubino", color:"Oro", flower:"Girasole", metal:"Oro"},
+  {name:"Vergine", emoji:"♍", start:[8,23], end:[9,22], el:"Terra", mode:"Mobile", planet:"Mercurio", traits:"Analitico, altruista", stone:"Zaffiro", color:"Blu navy", flower:"Margherita", metal:"Mercurio"},
+  {name:"Bilancia", emoji:"♎", start:[9,23], end:[10,22], el:"Aria", mode:"Cardinale", planet:"Venere", traits:"Diplomatico, armonioso", stone:"Opale", color:"Rosa cipria", flower:"Rosa", metal:"Rame"},
+  {name:"Scorpione", emoji:"♏", start:[10,23], end:[11,21], el:"Acqua", mode:"Fisso", planet:"Plutone", traits:"Intenso, magnetico", stone:"Topazio", color:"Bordeaux", flower:"Crisantemo", metal:"Ferro"},
+  {name:"Sagittario", emoji:"♐", start:[11,22], end:[12,21], el:"Fuoco", mode:"Mobile", planet:"Giove", traits:"Avventuroso, ottimista", stone:"Turchese", color:"Viola", flower:"Garofano", metal:"Stagno"},
+];
+const ORDER = ["Ariete","Toro","Gemelli","Cancro","Leone","Vergine","Bilancia","Scorpione","Sagittario","Capricorno","Acquario","Pesci"];
+const ZMAP = Object.fromEntries(ZODIAC.map(z=>[z.name,z]));
+const CHINESE = ["Scimmia","Gallo","Cane","Maiale","Topo","Bue","Tigre","Coniglio","Drago","Serpente","Cavallo","Capra"];
+const CHINESE_EMOJI = {"Topo":"🐭","Bue":"🐮","Tigre":"🐯","Coniglio":"🐰","Drago":"🐲","Serpente":"🐍","Cavallo":"🐴","Capra":"🐐","Scimmia":"🐵","Gallo":"🐓","Cane":"🐶","Maiale":"🐷"};
+const CHINESE_ELEMENTS = ["Metallo","Metallo","Acqua","Acqua","Legno","Legno","Fuoco","Fuoco","Terra","Terra"];
+const WEEKDAYS = ["Domenica","Lunedì","Martedì","Mercoledì","Giovedì","Venerdì","Sabato"];
+const WEEK_EMOJI = ["🌞","🌙","🔥","💧","🌳","✨","🌕"];
+const WEEK_NOTES = ["Solari, ottimisti.","Intuitivi, sensibili.","Determinati, coraggiosi.","Comunicativi, brillanti.","Filosofici, espansivi.","Artistici, venusiani.","Riflessivi, saggi."];
+const COMPAT_MATRIX = {
+  "Ariete":{Ariete:72,Toro:48,Gemelli:82,Cancro:45,Leone:90,Vergine:52,Bilancia:78,Scorpione:55,Sagittario:93,Capricorno:44,Acquario:80,Pesci:46},
+  "Toro":{Ariete:48,Toro:85,Gemelli:50,Cancro:88,Leone:49,Vergine:92,Bilancia:54,Scorpione:84,Sagittario:42,Capricorno:94,Acquario:46,Pesci:90},
+  "Gemelli":{Ariete:82,Toro:50,Gemelli:74,Cancro:52,Leone:84,Vergine:56,Bilancia:90,Scorpione:48,Sagittario:72,Capricorno:45,Acquario:93,Pesci:51},
+  "Cancro":{Ariete:45,Toro:88,Gemelli:52,Cancro:80,Leone:53,Vergine:84,Bilancia:50,Scorpione:92,Sagittario:47,Capricorno:83,Acquario:44,Pesci:95},
+  "Leone":{Ariete:90,Toro:49,Gemelli:84,Cancro:53,Leone:78,Vergine:51,Bilancia:86,Scorpione:58,Sagittario:91,Capricorno:46,Acquario:70,Pesci:49},
+  "Vergine":{Ariete:52,Toro:92,Gemelli:56,Cancro:84,Leone:51,Vergine:79,Bilancia:55,Scorpione:81,Sagittario:48,Capricorno:90,Acquario:50,Pesci:82},
+  "Bilancia":{Ariete:78,Toro:54,Gemelli:90,Cancro:50,Leone:86,Vergine:55,Bilancia:76,Scorpione:60,Sagittario:83,Capricorno:49,Acquario:91,Pesci:53},
+  "Scorpione":{Ariete:55,Toro:84,Gemelli:48,Cancro:92,Leone:58,Vergine:81,Bilancia:60,Scorpione:83,Sagittario:52,Capricorno:86,Acquario:47,Pesci:94},
+  "Sagittario":{Ariete:93,Toro:42,Gemelli:72,Cancro:47,Leone:91,Vergine:48,Bilancia:83,Scorpione:52,Sagittario:75,Capricorno:50,Acquario:88,Pesci:54},
+  "Capricorno":{Ariete:44,Toro:94,Gemelli:45,Cancro:83,Leone:46,Vergine:90,Bilancia:49,Scorpione:86,Sagittario:50,Capricorno:81,Acquario:52,Pesci:87},
+  "Acquario":{Ariete:80,Toro:46,Gemelli:93,Cancro:44,Leone:70,Vergine:50,Bilancia:91,Scorpione:47,Sagittario:88,Capricorno:52,Acquario:73,Pesci:56},
+  "Pesci":{Ariete:46,Toro:90,Gemelli:51,Cancro:95,Leone:49,Vergine:82,Bilancia:53,Scorpione:94,Sagittario:54,Capricorno:87,Acquario:56,Pesci:84}
+};
+const EVENTS_DB = {
+  "1-1":"Capodanno • 1801: scoperta di Cerere",
+  "14-2":"San Valentino • 278: martirio di Valentino",
+  "8-3":"Festa della Donna",
+  "2-6":"Festa della Repubblica Italiana, 1946",
+  "15-7":"1799: Stele di Rosetta",
+  "20-7":"Sbarco sulla Luna 1969",
+  "15-8":"Ferragosto • Assunzione",
+  "12-10":"1492: Colombo arriva in America",
+  "31-10":"Halloween • 1517: Lutero",
+  "4-11":"1922: tomba di Tutankhamon",
+  "25-12":"Natale • 1642: nasce Newton"
+};
+
+const NAME_MEANINGS = {
+  "aaron":"Illuminato, montuoso (etimologia discussa)",
+  "abele":"Soffio, vanità (biblico)",
+  "abigail":"Padre della gioia",
+  "abigaille":"Padre della gioia",
+  "abraham":"Padre di molti",
+  "abramo":"Padre elevato",
+  "achille":"Eroe, dolore del popolo (etimologia discussa)",
+  "ada":"Nobile, allegra",
+  "adam":"Uomo, nato dalla terra",
+  "adamo":"Uomo, nato dalla terra",
+  "addolorata":"Addolorata (Madonna)",
+  "adelfo":"Fratello nobile",
+  "adelmo":"Elmo nobile, protettore nobile",
+  "ademaro":"Nobile e famoso",
+  "adolfo":"Lupo nobile",
+  "adrian":"Dall'Adriatico, scuro",
+  "adriana":"Dall'Adriatico, scura",
+  "adrianne":"Dall'Adriatico",
+  "adriano":"Dall'Adriatico",
+  "agapito":"Amato, diletto",
+  "agar":"Fuggitiva (biblico)",
+  "agata":"Buona, virtuosa",
+  "agnes":"Pura, casta",
+  "agnese":"Pura, casta",
+  "agostina":"Venerabile, consacrata",
+  "agostino":"Venerabile",
+  "albert":"Nobile e brillante",
+  "alberta":"Nobile e brillante",
+  "alberto":"Nobile brillante",
+  "albina":"Bianca, candida",
+  "albino":"Bianco, candido",
+  "alcide":"Forte, da Alcide (Ercole)",
+  "alda":"Antica, nobile (forma femminile di Aldo)",
+  "aldo":"Vecchio, saggio, nobile",
+  "alessandra":"Protettore/trice degli uomini",
+  "alessandro":"Protettore degli uomini, difensore",
+  "alessia":"Difenditrice, colei che aiuta",
+  "alessio":"Difensore, colui che aiuta",
+  "alex":"Protettore",
+  "alexander":"Protettore degli uomini",
+  "alexandra":"Protettore degli uomini",
+  "alexis":"Difensore, colui che aiuta",
+  "alfio":"Bianco, candido",
+  "alfonsina":"Nobile e pronta",
+  "alfonso":"Nobile e pronto, combattivo",
+  "alfred":"Consigliere saggio",
+  "alfreda":"Consigliera saggia (forma femminile di Alfredo)",
+  "alfredo":"Consigliere degli Elfi, saggio",
+  "alice":"Nobile, di stirpe nobile",
+  "alighiero":"Esercito nobile di lance",
+  "allegra":"Allegra, gioiosa",
+  "allegro":"Allegro, gioioso",
+  "alvise":"Guerriero illustre (forma veneta)",
+  "amalia":"Laboriosa, industriosa",
+  "amanda":"Degna di essere amata",
+  "amato":"Amato",
+  "ambrogio":"Immortale, divino",
+  "amedeo":"Colui che ama Dio",
+  "amelia":"Laboriosa, industriosa",
+  "amelie":"Laboriosa",
+  "amerigo":"Potente e laborioso sotto il comando",
+  "amleto":"Casa, dimora (via letteraria)",
+  "amos":"Portato, forte",
+  "amy":"Amata",
+  "anacleto":"Invocato, richiamato",
+  "anastasia":"Risorta, rinascita",
+  "anastasio":"Risorto",
+  "andrea":"Virile / anche femminile in molte culture",
+  "andreina":"Coraggiosa (forma femminile da Andrea)",
+  "andrew":"Virile, coraggioso",
+  "andromeda":"Colei che domina gli uomini (mitologico)",
+  "angel":"Angelo",
+  "angela":"Messaggera di Dio, angelo",
+  "angelica":"Angelica, simile a un angelo",
+  "angelico":"Angelico",
+  "angelina":"Piccolo angelo",
+  "angelo":"Messaggero di Dio",
+  "anicia":"Della gens Anicia",
+  "anita":"Grazia (da Anna)",
+  "anna":"Grazia, favore",
+  "annachiara":"Grazia luminosa",
+  "annalisa":"Grazia e giuramento divino",
+  "annamaria":"Anna e Maria",
+  "annarita":"Grazia e perla",
+  "anne":"Grazia",
+  "annette":"Piccola grazia",
+  "annibale":"Grazia di Baal / favore del signore",
+  "annika":"Grazia",
+  "annunziata":"Annunciata",
+  "annunziato":"Annunciato",
+  "anselma":"Protezione divina (forma femminile di Anselmo)",
+  "anselmo":"Elmo divino, protezione divina",
+  "anthony":"Inestimabile",
+  "anto":"Inestimabile (ipocoristico)",
+  "antonella":"Inestimabile",
+  "antonello":"Inestimabile (forma maschile)",
+  "antonia":"Inestimabile (forma femminile di Antonio)",
+  "antonietta":"Inestimabile",
+  "antonio":"Inestimabile, che va incontro",
+  "apollo":"Distruttore / dio della luce (etimologia discussa)",
+  "arcangela":"Capo degli angeli (forma femminile)",
+  "arcangelo":"Arcangelo, capo degli angeli",
+  "archimede":"Maestro del pensiero, eccellente pensatore",
+  "argento":"Argento, prezioso",
+  "aria":"Aria, melodia",
+  "ariadne":"Santissima",
+  "arianna":"Santissima, purissima",
+  "ariel":"Leone di Dio",
+  "aristide":"Il migliore, nobile",
+  "arman":"Uomo dell'esercito",
+  "armanda":"Donna dell'esercito",
+  "armando":"Uomo dell'esercito",
+  "arnaldo":"Aquila che regna",
+  "arnold":"Aquila che regna",
+  "arnoldo":"Aquila che regna",
+  "arnolfo":"Lupo dell'aquila",
+  "aronne":"Illuminato (etimologia discussa)",
+  "arrigo":"Signore della casa (da Enrico)",
+  "artemisia":"Dedicata ad Artemide",
+  "arthur":"Orso / pietra",
+  "arturo":"Orso / pietra (etimologia celtica discussa)",
+  "ascher":"Felice, beato",
+  "assunta":"Assunta",
+  "astrid":"Forza divina, bella come una dea",
+  "atanasia":"Immortale",
+  "atanasio":"Immortale",
+  "atena":"Dea della sapienza",
+  "attilia":"Della gens Attilia (forma femminile)",
+  "attilio":"Della gens Attilia",
+  "augusta":"Venerabile, maestosa",
+  "augusto":"Venerabile, maestoso",
+  "aurea":"Dorata",
+  "aurelia":"Dorata",
+  "aurelio":"Dorato, splende come l'oro",
+  "aurora":"Alba, luce del mattino, rinascita",
+  "ava":"Uccello / vita (etimologia multipla)",
+  "azeglio":"Luogo di lecci / toponimo",
+  "baldassarre":"Baal protegge il re",
+  "baldo":"Audace, coraggioso",
+  "barbara":"Straniera, forestiera",
+  "barbaro":"Straniero",
+  "barbie":"Straniera (ipocoristico)",
+  "bartholomew":"Figlio di Tolomeo",
+  "bartolomeo":"Figlio di Tolomeo, figlio dell'aratura",
+  "basil":"Reale",
+  "basilio":"Reale",
+  "battista":"Battista, che battezza",
+  "beata":"Beata, felice",
+  "beato":"Beato, felice",
+  "beatrice":"Colei che rende felice, portatrice di gioia",
+  "ben":"Figlio (ipocoristico)",
+  "benedetta":"Benedetta",
+  "benedetto":"Benedetto",
+  "benedict":"Benedetto",
+  "beniamino":"Figlio della destra, prediletto",
+  "benigno":"Benevolo, gentile",
+  "benjamin":"Figlio della destra",
+  "beppe":"Dio aggiungerà (ipocoristico)",
+  "berengario":"Lancia dell'orso",
+  "bernard":"Orso coraggioso",
+  "bernarda":"Orsa coraggiosa",
+  "bernardo":"Orso coraggioso",
+  "beth":"Casa / da Elisabetta",
+  "betty":"Da Elisabetta, giuramento divino",
+  "biagio":"Balbuziente (santo taumaturgo)",
+  "bianca":"Bianca, pura, candida",
+  "bianco":"Bianco, candido, puro",
+  "billy":"Volontà con elmo (ipocoristico)",
+  "blaise":"Balbuziente",
+  "bonaventura":"Buona ventura, fortuna",
+  "bonifacio":"Buona sorte, benefattore",
+  "brian":"Nobile, forte, elevato",
+  "bridget":"Forza",
+  "brigida":"Forza elevata",
+  "bruna":"Bruna, scura",
+  "brunella":"Piccola bruna",
+  "bruno":"Marrone, scuro, corazzato",
+  "bryan":"Nobile, forte",
+  "caino":"Acquisito (biblico)",
+  "caleb":"Cane / coraggioso (etimologia discussa)",
+  "calliope":"Bella voce",
+  "calogera":"Venerabile monastica (forma femminile)",
+  "calogero":"Bel vecchio, venerabile monastico",
+  "camilla":"Ministra del tempio, nobile ancella",
+  "camillo":"Ministro, messaggero sacro",
+  "candida":"Candida, pura",
+  "candido":"Candido, puro",
+  "carla":"Donna libera",
+  "carlo":"Uomo libero, forte",
+  "carlotta":"Donna libera",
+  "carmela":"Giardino di Dio",
+  "carmelo":"Giardino di Dio",
+  "carmen":"Canto, giardino (etimologia multipla)",
+  "carmine":"Giardino di Dio / canto",
+  "carol":"Canto di gioia / donna libera",
+  "carolina":"Donna libera",
+  "caroline":"Donna libera",
+  "casimira":"Proclamatrice della pace",
+  "casimiro":"Proclamatore della pace",
+  "cassandra":"Profetessa (mitologico)",
+  "cataldo":"Battaglia / santo irlandese",
+  "caterina":"Pura",
+  "catherine":"Pura",
+  "catone":"Accorto, saggio (soprannome romano)",
+  "cecile":"Cecilia",
+  "cecilia":"Cecilia, cieca (gens Caecilia) o celeste",
+  "cecilio":"Della gens Cecilia",
+  "celeste":"Celeste, del cielo",
+  "celestina":"Celeste",
+  "celestino":"Celeste",
+  "celia":"Celeste",
+  "cesare":"Capo, tagliato (etimologia antica)",
+  "cesarina":"Da Cesare",
+  "charles":"Uomo libero",
+  "charlie":"Libero",
+  "charlotte":"Donna libera",
+  "cherubino":"Cherubino, angelo",
+  "chiara":"Luminosa, splendente, chiara",
+  "chloe":"Germoglio verde",
+  "christian":"Cristiano, seguace di Cristo",
+  "christina":"Consacrata a Cristo",
+  "christine":"Consacrata a Cristo",
+  "cindy":"Da Cinzia / da Lucinda",
+  "cinzia":"Appartenente a Diana (Cinto)",
+  "ciriaco":"Del Signore",
+  "cirillo":"Signore",
+  "claire":"Chiara",
+  "clara":"Chiara",
+  "clarissa":"Chiarissima",
+  "claudia":"Della gens Claudia",
+  "claudio":"Della gens Claudia",
+  "clelia":"Gloria",
+  "clemente":"Clemente",
+  "clementina":"Clemente",
+  "cleopatra":"Gloria del padre",
+  "cleto":"Invocato",
+  "cloe":"Germoglio verde, fiorente",
+  "colomba":"Colomba, pace",
+  "colombo":"Colomba",
+  "concetta":"Concepita (Immacolata Concezione)",
+  "concetto":"Concepito",
+  "concezione":"Concezione",
+  "conrad":"Coraggioso consigliere",
+  "conrado":"Coraggioso consigliere",
+  "consolata":"Consolata",
+  "corinna":"Fanciulla, vergine",
+  "corona":"Corona, incoronata",
+  "corrado":"Coraggioso consiglio",
+  "cosima":"Ordine, universo, bellezza (forma femminile)",
+  "cosimo":"Ordine, universo",
+  "cosma":"Ordine, universo",
+  "cosmo":"Ordine, universo, bellezza",
+  "costantina":"Costante, ferma",
+  "costantino":"Costante",
+  "costanza":"Costante, ferma, stabile",
+  "costanzo":"Costante, fermo",
+  "crescenzo":"Crescente, che cresce",
+  "crispino":"Ricciuto",
+  "cristiana":"Cristiana, consacrata a Cristo",
+  "cristiano":"Cristiano, seguace di Cristo",
+  "cristina":"Seguace di Cristo, consacrata",
+  "crocifissa":"Crocifissa (devozionale)",
+  "crystal":"Cristallo, limpida",
+  "cyril":"Signore",
+  "daisy":"Margherita, fiore",
+  "dakota":"Amico, alleato (nativo americano / moderno)",
+  "damian":"Domatore",
+  "damiana":"Domatrice (forma femminile di Damiano)",
+  "damiano":"Domatore",
+  "daniel":"Dio è il mio giudice",
+  "daniela":"Dio è il mio giudice",
+  "daniele":"Dio è il mio giudice",
+  "danielle":"Dio è il mio giudice",
+  "dario":"Possessore di beni, ricco",
+  "david":"Amato, prediletto",
+  "davide":"Amato",
+  "debora":"Ape, operosa, eloquente",
+  "deborah":"Ape",
+  "demetria":"Dedicata a Demetra",
+  "demetrio":"Di Demetra",
+  "denis":"Consacrato a Dioniso",
+  "denise":"Consacrata a Dioniso",
+  "dennis":"Consacrato a Dioniso",
+  "desideria":"Desiderata",
+  "desiderio":"Desiderio, desiderato",
+  "diamante":"Diamante, indistruttibile",
+  "diana":"Divina, dea della caccia",
+  "diane":"Divina",
+  "diego":"Istruito, insegnante (etimologia discussa)",
+  "dina":"Giudicata, vendicata",
+  "dino":"Piccolo spada / ipocoristico",
+  "dionigi":"Consacrato a Dioniso",
+  "dionisio":"Consacrato a Dioniso",
+  "dolores":"Dolori",
+  "domenica":"Appartenente al Signore",
+  "domenico":"Appartenente al Signore",
+  "dominic":"Del Signore",
+  "donata":"Donata, dono",
+  "donatella":"Piccola donata",
+  "donatello":"Piccolo donato",
+  "donato":"Donato, dono",
+  "donna":"Donna, signora",
+  "dora":"Dono",
+  "doris":"Dono del mare",
+  "durante":"Costante, duraturo",
+  "eden":"Delizia, giardino",
+  "edita":"Guerriera prospera",
+  "edith":"Guerriera prospera",
+  "edmondo":"Protettore della ricchezza",
+  "edmund":"Protettore della ricchezza",
+  "edoardo":"Guardiano della ricchezza, protettore benedetto",
+  "eduardo":"Guardiano della ricchezza",
+  "edward":"Guardiano della ricchezza",
+  "efisio":"Di Efeso",
+  "egeo":"Del mar Egeo",
+  "egidio":"Scudo di pelle di capra, protettore",
+  "eirene":"Pace",
+  "eleanor":"Luce",
+  "elena":"Luce del sole",
+  "eleonora":"Luce / compassione",
+  "elia":"Il mio Dio è Yahvè",
+  "elias":"Il mio Dio è Yahvè",
+  "eliezer":"Dio è aiuto",
+  "elio":"Sole",
+  "eliodoro":"Dono del sole",
+  "elisa":"Dio è giuramento",
+  "elisabeth":"Dio è il mio giuramento",
+  "elisabetta":"Dio è il mio giuramento",
+  "eliseo":"Dio è salvezza",
+  "elisha":"Dio è salvezza",
+  "eliza":"Dio è il mio giuramento",
+  "elizabeth":"Dio è il mio giuramento",
+  "ella":"Luce, fata (ipocoristico moderno)",
+  "ellen":"Luce",
+  "elsa":"Nobile / da Elisabetta",
+  "elvira":"Vera / amica degli elfi",
+  "emanuela":"Dio è con noi",
+  "emanuele":"Dio è con noi",
+  "emidio":"Santo protettore (etimologia discussa)",
+  "emilia":"Rivaleggiante, industriosa",
+  "emiliana":"Della gens Emilia",
+  "emiliano":"Della gens Emilia",
+  "emilio":"Rivaleggiante, industrioso",
+  "emily":"Industriosa",
+  "emma":"Universale",
+  "emmanuele":"Dio è con noi",
+  "ennio":"Nome latino di origine oscura",
+  "enrica":"Signora della casa",
+  "enrico":"Signore della casa, ricco e potente",
+  "enzo":"Signore della casa, principe",
+  "epifania":"Manifestazione",
+  "epifanio":"Manifestazione, epifania",
+  "ercole":"Gloria di Hera",
+  "erica":"Sempre potente, regina / erica (fiore)",
+  "erika":"Sempre potente",
+  "erin":"Irlanda, pace",
+  "ermanno":"Uomo dell'esercito",
+  "erminia":"Universale",
+  "erminio":"Universale",
+  "ernest":"Serio, risoluto",
+  "ernesta":"Seria, risoluta",
+  "ernesto":"Risoluto",
+  "esdra":"Aiuto",
+  "esmeralda":"Smeraldo",
+  "ester":"Stella",
+  "esther":"Stella",
+  "ettore":"Saldo, che tiene fermo",
+  "eugene":"Ben nato",
+  "eugenia":"Ben nata, nobile",
+  "eugenio":"Ben nato",
+  "eulalia":"Che parla bene",
+  "euridice":"Giusta ampia (mitologico)",
+  "eusebio":"Pio, devoto",
+  "eustachio":"Spiga fertile, prospero",
+  "eva":"Vita",
+  "eve":"Vivente",
+  "evelyn":"Desiderata, nocciola (etimologia multipla)",
+  "ezechiele":"Dio rafforza",
+  "ezekiel":"Dio rafforza",
+  "ezio":"Aquila",
+  "ezra":"Aiuto",
+  "fabia":"Della gens Fabia",
+  "fabiana":"Della gens Fabia",
+  "fabiano":"Della gens Fabia",
+  "fabio":"Coltivatore di fave, operoso",
+  "fabiola":"Della gens Fabia",
+  "fabricio":"Artigiano",
+  "fabrizia":"Artigiana (forma femminile di Fabrizio)",
+  "fabrizio":"Artigiano, fabbro",
+  "fanny":"Libera (da Francesca)",
+  "fatima":"Astinenza / santuario mariano",
+  "fausta":"Fortunata",
+  "faustina":"Fortunata",
+  "fausto":"Fortunato",
+  "federica":"Sovrana della pace",
+  "federico":"Principe della pace",
+  "felice":"Felice, fortunato",
+  "felicia":"Felice",
+  "felicita":"Felicità",
+  "ferdinanda":"Audace viaggiatrice",
+  "ferdinando":"Audace viaggiatore",
+  "fernando":"Audace nei viaggi",
+  "ferragosto":"Ferie di Augusto (raro come nome)",
+  "fiacre":"Santo irlandese (etimologia celtica)",
+  "filiberto":"Molto brillante",
+  "filippa":"Amante dei cavalli (forma femminile)",
+  "filippo":"Amante dei cavalli",
+  "filomena":"Amata",
+  "fiona":"Bianca, bella",
+  "fiore":"Fiore",
+  "fiorenza":"Fiorente, in fiore",
+  "fiorenzo":"Fiorente",
+  "firmino":"Fermo, saldo",
+  "flavia":"Bionda, dorata",
+  "flaviano":"Della gens Flavia",
+  "flavio":"Biondo",
+  "flora":"Fiori, dea della primavera",
+  "florence":"Fiorente",
+  "floriana":"Fiorente",
+  "floriano":"Fiorente",
+  "fortuna":"Fortuna",
+  "fortunata":"Fortunata",
+  "fortunato":"Fortunato",
+  "fosca":"Scura, fosca",
+  "fosco":"Scuro",
+  "fotina":"Luminosa",
+  "franca":"Libera",
+  "frances":"Libera",
+  "francesca":"Libera, francese",
+  "francesco":"Uomo libero, francese",
+  "francis":"Libero",
+  "francisco":"Libero",
+  "franco":"Libero, franco",
+  "freya":"Signora, dea dell'amore (nordico)",
+  "fulvia":"Dalla gens Fulvia, bionda",
+  "fulvio":"Della gens Fulvia",
+  "gabino":"Di Gabi (città antica)",
+  "gabriel":"Forza di Dio",
+  "gabriele":"Dio è la mia forza",
+  "gabriella":"Forza di Dio",
+  "gabrielle":"Dio è la mia forza (forma femminile)",
+  "gaetana":"Nata a Gaeta, prospera",
+  "gaetano":"Nato a Gaeta, prospero",
+  "gaia":"Terra, madre terra, gioia",
+  "galileo":"Della Galilea",
+  "gaspare":"Tesorierre, custode del tesoro (etimologia discussa)",
+  "gasparo":"Custode del tesoro",
+  "gastone":"Ospite, forestiero",
+  "gedeone":"Guerriero",
+  "geltrude":"Lancia forte",
+  "geminiano":"Gemello",
+  "gemma":"Gemma, pietra preziosa",
+  "generosa":"Generosa",
+  "generoso":"Generoso",
+  "gennaro":"Di Giano, gennaio",
+  "george":"Contadino, lavoratore della terra",
+  "georgia":"Contadina",
+  "georgina":"Contadina",
+  "gerald":"Lancia che regna",
+  "gerarda":"Lancia forte (forma femminile)",
+  "gerardo":"Lancia forte",
+  "geremia":"Dio eleva",
+  "germana":"Sorella / del medesimo ceppo",
+  "germano":"Germano, fratello / del medesimo ceppo",
+  "gerolamo":"Nome sacro, santo nome",
+  "gershon":"Esilio, straniero",
+  "gertrude":"Lancia forte",
+  "gervaso":"Lancia di guerra",
+  "gherardo":"Lancia forte",
+  "gia":"Dio è misericordioso (ipocoristico)",
+  "giacinta":"Giacinto",
+  "giacinto":"Giacinto",
+  "giacobbe":"Colui che segue",
+  "giacomo":"Colui che segue",
+  "giambattista":"Giovanni Battista",
+  "giampaolo":"Giovanni e Paolo",
+  "gianbattista":"Giovanni Battista",
+  "giancarlo":"Giovanni e Carlo",
+  "gianfranco":"Giovanni e Franco",
+  "gianlorenzo":"Giovanni e Lorenzo",
+  "gianluca":"Giovanni e Luca insieme",
+  "gianluigi":"Giovanni e Luigi",
+  "gianmarco":"Giovanni e Marco",
+  "gianmaria":"Giovanni e Maria",
+  "gianna":"Dio è misericordioso",
+  "gianni":"Dio è misericordioso",
+  "gianpaolo":"Giovanni e Paolo",
+  "gianpiero":"Giovanni e Piero",
+  "gideon":"Guerriero, abbattitore",
+  "giglio":"Giglio, purezza",
+  "gilberto":"Fulgido, brillante, ospite illustre",
+  "gilda":"Sacrificio, valore, oro",
+  "gina":"Regina",
+  "ginevra":"Bianca come la schiuma, magica",
+  "gino":"Ipocoristico (da Giorgio, Luigino…)",
+  "gioacchino":"Dio preparerà, eretto da Dio",
+  "gioachino":"Dio preparerà",
+  "giobbe":"Perseguitato, odiato (biblico)",
+  "gioconda":"Gioconda, allegra",
+  "gioele":"Yahvè è Dio",
+  "gioia":"Gioia",
+  "giona":"Colomba",
+  "gionata":"Dio ha dato",
+  "giordana":"Fiume Giordano (forma femminile)",
+  "giordano":"Fiume Giordano",
+  "giorgia":"Contadina, lavoratrice della terra",
+  "giorgio":"Contadino, lavoratore della terra",
+  "giosuè":"Dio è salvezza",
+  "giovanna":"Dio è misericordioso",
+  "giovanni":"Dio è misericordioso",
+  "giovannino":"Piccolo Giovanni",
+  "girolamo":"Nome sacro",
+  "giuda":"Lode, celebrato",
+  "giuditta":"Donna giudea, lodata",
+  "giulia":"Giovane, dedicata a Giove",
+  "giuliana":"Della gens Giulia",
+  "giuliano":"Della gens Giulia",
+  "giulietta":"Piccola Giulia",
+  "giulio":"Della gens Giulia",
+  "giuseppe":"Dio aggiungerà",
+  "giuseppina":"Dio aggiungerà",
+  "giustina":"Giusta",
+  "giustino":"Giusto",
+  "giusto":"Giusto",
+  "glauco":"Verde-azzurro, splendente",
+  "gloria":"Gloria, fama",
+  "godfrey":"Pace divina",
+  "goffredo":"Pace di Dio, pace divina",
+  "grazia":"Grazia",
+  "graziana":"Graziosa, favorevole",
+  "graziano":"Grazioso, favorevole",
+  "graziella":"Piccola grazia",
+  "gregorio":"Attento, vigilante",
+  "gregory":"Attento",
+  "greta":"Perla, preziosa",
+  "griselda":"Pietra grigia, combattente",
+  "gualtiero":"Capo dell'esercito",
+  "guarniero":"Guerriero che difende",
+  "guglielmo":"Volontà con elmo, protettore risoluto",
+  "guido":"Guida, condottiero",
+  "guillaume":"Volontà con elmo",
+  "guy":"Guida",
+  "hanna":"Grazia, favore",
+  "hannah":"Grazia, favore",
+  "hector":"Saldo",
+  "helen":"Luce, torcia",
+  "helene":"Luce",
+  "hercules":"Gloria di Hera",
+  "hermann":"Uomo dell'esercito",
+  "hilary":"Allegro",
+  "horace":"Della gens Horatia",
+  "hugo":"Intelletto, spirito",
+  "humberto":"Guerriero famoso",
+  "ignacio":"Di fuoco",
+  "ignazio":"Di fuoco, ardente (etimologia discussa)",
+  "igor":"Guerriero, guardiano",
+  "ilaria":"Allegra",
+  "ilario":"Allegro, sereno, gioioso",
+  "immacolata":"Immacolata",
+  "immanuel":"Dio è con noi",
+  "inigo":"Di fuoco (variante di Ignazio)",
+  "ioan":"Dio è misericordioso",
+  "ippolita":"Che scioglie i cavalli (forma femminile)",
+  "ippolito":"Che scioglie i cavalli",
+  "ira":"Vigilante",
+  "irene":"Pace",
+  "iris":"Arcobaleno, messaggera",
+  "isaac":"Egli riderà",
+  "isabella":"Dio è giuramento / bella dea (etimologie multiple)",
+  "isabelle":"Dio è giuramento",
+  "isacco":"Egli riderà",
+  "isaia":"Dio è salvezza",
+  "isaiah":"Dio è salvezza",
+  "isidora":"Dono di Iside (forma femminile)",
+  "isidore":"Dono di Iside",
+  "isidoro":"Dono di Iside",
+  "isola":"Isola",
+  "israel":"Colui che lotta con Dio",
+  "israele":"Colui che lotta con Dio",
+  "itala":"Italica, dell'Italia",
+  "italia":"Italia",
+  "italo":"Italico, dell'Italia",
+  "ivan":"Dio è misericordioso",
+  "ivana":"Dio è misericordioso (forma femminile di Ivan)",
+  "ivanoe":"Letterario (Ivanhoe)",
+  "jacob":"Colui che segue",
+  "jacopo":"Colui che segue",
+  "jean":"Dio è misericordioso",
+  "jerome":"Nome sacro",
+  "jeronimo":"Nome sacro",
+  "jessica":"Colei che guarda / da Iscah (letterario)",
+  "joanna":"Dio è misericordioso",
+  "joel":"Yahvè è Dio",
+  "john":"Dio è misericordioso",
+  "jonah":"Colomba",
+  "jonas":"Colomba",
+  "jonathan":"Dio ha dato",
+  "joseph":"Dio aggiungerà",
+  "josephine":"Dio aggiungerà",
+  "joshua":"Dio è salvezza",
+  "josiah":"Dio sostiene",
+  "josé":"Dio aggiungerà",
+  "juan":"Dio è misericordioso",
+  "judith":"Lodata",
+  "julia":"Giovane",
+  "julian":"Della gens Giulia",
+  "juliana":"Della gens Giulia",
+  "julie":"Giovane",
+  "juliet":"Piccola Giulia",
+  "julius":"Della gens Giulia",
+  "justin":"Giusto",
+  "justine":"Giusta",
+  "kai":"Mare / salice / guerriero (etimologie multiple)",
+  "karl":"Uomo libero",
+  "kaspar":"Custode del tesoro",
+  "kate":"Pura",
+  "katharina":"Pura",
+  "katherine":"Pura",
+  "kathy":"Pura",
+  "katie":"Pura",
+  "kelly":"Guerriera, chiesa (irlandese)",
+  "kevin":"Gentile, bello",
+  "kim":"Reale / ipocoristico",
+  "klaus":"Vittoria del popolo (da Nikolaus)",
+  "kurt":"Coraggioso consiglio (da Konrad)",
+  "ladislao":"Regola gloriosa, potere glorioso",
+  "lamberto":"Terra luminosa",
+  "lando":"Terra (ipocoristico germanico)",
+  "landolfo":"Lupo della terra",
+  "lara":"Protettiva, celebre (etimologia multipla)",
+  "laura":"Alloro",
+  "laure":"Alloro",
+  "lauren":"Alloro",
+  "laurence":"Dall'alloro",
+  "lauro":"Alloro",
+  "lawrence":"Dall'alloro",
+  "layla":"Notte",
+  "lazarus":"Dio ha aiutato",
+  "lazzaro":"Dio ha aiutato",
+  "lea":"Delicata",
+  "leah":"Stanca",
+  "leandra":"Donna leone",
+  "leandro":"Uomo leone",
+  "leda":"Signora (mitologico)",
+  "leila":"Notte, oscura bellezza",
+  "lena":"Luce (da Elena/Maddalena)",
+  "leo":"Leone",
+  "leona":"Leonessa, forte e coraggiosa",
+  "leonardo":"Leone coraggioso",
+  "leone":"Leone, forte e coraggioso",
+  "leonida":"Figlio del leone",
+  "leonidas":"Figlio del leone",
+  "leonora":"Luce",
+  "leopolda":"Popolo audace (forma femminile)",
+  "leopoldo":"Popolo audace",
+  "letizia":"Letizia, gioia",
+  "levi":"Unito, attaccato",
+  "lia":"Unita / da Lea",
+  "liam":"Volere protettore, determinata protezione",
+  "liberata":"Liberata",
+  "liberato":"Liberato",
+  "liborio":"Libero / santo",
+  "licia":"Dalla Licia",
+  "lidia":"Dalla Lidia, donna orientale",
+  "lido":"Lido, riva",
+  "lilia":"Giglio",
+  "liliana":"Giglio, pura",
+  "lina":"Tenero / ipocoristico",
+  "linda":"Bella, morbida",
+  "lisa":"Da Elisabetta",
+  "livia":"Della gens Livia",
+  "livio":"Della gens Livia",
+  "lodovico":"Guerriero illustre",
+  "lola":"Dolori / ipocoristico di Dolores o Carlotta",
+  "lora":"Alloro",
+  "loredana":"Da Loreo / letterario moderno",
+  "lorena":"Dalla Lorena",
+  "lorenza":"Incoronata d'alloro",
+  "lorenzo":"Incoronato d'alloro, vittorioso",
+  "loreto":"Da Loreto (santuari)",
+  "loretta":"Alloro",
+  "louis":"Guerriero illustre",
+  "louise":"Guerriera illustre",
+  "lourdes":"Da Lourdes (santuario)",
+  "luca":"Luce (in Italia tipicamente maschile)",
+  "lucas":"Portatore di luce",
+  "luce":"Luce",
+  "lucia":"Luce, luminosa",
+  "luciana":"Luminosa, portatrice di luce",
+  "luciano":"Luminoso, portatore di luce",
+  "lucilla":"Piccola luce",
+  "lucio":"Luminoso",
+  "lucrezia":"Ricchezza",
+  "lucrezio":"Ricchezza",
+  "lucy":"Luce",
+  "ludovica":"Guerriera illustre",
+  "ludovico":"Guerriero illustre",
+  "ludwig":"Guerriero illustre",
+  "luigi":"Guerriero illustre",
+  "luigia":"Guerriera famosa",
+  "luisa":"Guerriera illustre",
+  "luka":"Portatore di luce",
+  "luke":"Portatore di luce",
+  "luna":"Luna, luminosa di notte",
+  "lydia":"Dalla Lidia",
+  "macario":"Beato, felice",
+  "maddalena":"Di Magdala",
+  "madeleine":"Di Magdala",
+  "madison":"Figlio di Maud (moderno)",
+  "magda":"Di Magdala",
+  "magdalena":"Di Magdala",
+  "maia":"Nutrice, dea della crescita",
+  "malachi":"Mio messaggero",
+  "manlio":"Della gens Manlia",
+  "manuel":"Dio è con noi",
+  "manuela":"Dio è con noi",
+  "manuele":"Dio è con noi",
+  "mara":"Amara",
+  "marcella":"Guerriera",
+  "marcellino":"Piccolo Marte",
+  "marcello":"Piccolo Marte, guerriero",
+  "marcia":"Dedicata a Marte",
+  "marco":"Di Marte",
+  "margaret":"Perla",
+  "margherita":"Perla",
+  "maria":"Amata / signora del mare",
+  "maria maddalena":"Maria di Magdala",
+  "mariana":"Di Maria / della gens Mariana",
+  "mariangela":"Maria angelo",
+  "marianna":"Maria e Anna",
+  "mariano":"Di Maria / della gens Mariana",
+  "mariarosaria":"Maria e Rosaria",
+  "marie":"Amata",
+  "mariella":"Piccola Maria",
+  "marietta":"Piccola Maria",
+  "marina":"Del mare, marinara",
+  "marino":"Del mare",
+  "mario":"Di Marte / maschio",
+  "mark":"Dedicato a Marte",
+  "marta":"Signora",
+  "martha":"Signora",
+  "martin":"Dedicato a Marte",
+  "martina":"Di Marte",
+  "martino":"Di Marte",
+  "mary":"Amata",
+  "marzia":"Dedicata a Marte",
+  "marzio":"Di Marte",
+  "massimiliano":"Il più grande",
+  "massimo":"Il più grande, massimo",
+  "mathilde":"Forte in battaglia",
+  "matilda":"Forte in battaglia",
+  "matilde":"Forte in battaglia",
+  "matteo":"Dono di Dio",
+  "mattia":"Dono di Dio",
+  "maura":"Scura",
+  "maurice":"Scuro",
+  "maurizia":"Scura, moresca (forma femminile di Maurizio)",
+  "maurizio":"Scuro",
+  "mauro":"Scuro, moresco",
+  "max":"Massimo",
+  "maximilian":"Il più grande",
+  "maximiliano":"Il più grande",
+  "maya":"Illusione / nutrice (etimologie multiple)",
+  "melania":"Scura",
+  "melanie":"Scura, nera",
+  "melchiorre":"Re della luce (etimologia discussa)",
+  "melissa":"Ape",
+  "mercedes":"Mercedi, grazie",
+  "meta":"Meta, obiettivo",
+  "mia":"Mia",
+  "micaela":"Chi è come Dio?",
+  "michael":"Chi è come Dio?",
+  "michela":"Chi è come Dio?",
+  "michelangelo":"Michele + Angelo",
+  "michele":"Chi è come Dio?",
+  "michelle":"Chi è come Dio?",
+  "mikael":"Chi è come Dio?",
+  "mila":"Cara al popolo / graziosa",
+  "milena":"Graziosa, cara",
+  "milo":"Grazioso / soldato (etimologie multiple)",
+  "mira":"Meravigliosa, pace (etimologie multiple)",
+  "miranda":"Degna di ammirazione",
+  "mirca":"Pace / famosa (forma femminile di Mirco)",
+  "mirco":"Pace / famoso (slavo)",
+  "mirella":"Ammirevole, mirra",
+  "miriam":"Amata, signora del mare",
+  "mirka":"Pace / famosa (forma femminile di Mirko)",
+  "mirko":"Pace / famoso",
+  "modesta":"Modesta",
+  "modesto":"Modesto",
+  "monica":"Consigliera, unica, solitaria",
+  "monique":"Consigliera",
+  "mora":"Bruna, scura; anche frutto del gelso",
+  "morella":"Piccola mora / bruna (diminutivo)",
+  "morello":"Bruno, scuro (diminutivo di Moro/Moreno)",
+  "morena":"Bruna, scura di carnagione o capelli (forma femminile di Moreno)",
+  "moreno":"Bruno, scuro",
+  "morgan":"Nato dal mare",
+  "morgana":"Nata dal mare (arturiano)",
+  "moro":"Bruno, scuro",
+  "moses":"Tratto dalle acque",
+  "mosè":"Tratto dalle acque",
+  "nadia":"Speranza",
+  "nadine":"Speranza",
+  "nancy":"Grazia (da Anna)",
+  "naomi":"Dolcezza",
+  "narciso":"Narciso, fiore; sonnolento (mitologico)",
+  "natale":"Natale",
+  "natalia":"Nata a Natale",
+  "natalie":"Natale",
+  "natalina":"Nata a Natale",
+  "natasha":"Natale",
+  "nathalie":"Natale",
+  "nathan":"Dono",
+  "nathaniel":"Dono di Dio",
+  "nazarena":"Di Nazareth (forma femminile)",
+  "nazareno":"Di Nazareth",
+  "nazzareno":"Di Nazareth",
+  "neemia":"Dio consola",
+  "nello":"Ipocoristico (da Antonello, Lionello…)",
+  "nelly":"Luce (ipocoristico)",
+  "nenè":"Ipocoristico affettivo",
+  "nero":"Nero",
+  "nestore":"Colui che ritorna a casa",
+  "niccolo":"Vittoria del popolo",
+  "niccolò":"Vittoria del popolo",
+  "nicholas":"Vittoria del popolo",
+  "nicola":"Vittoria del popolo",
+  "nicole":"Vittoria del popolo",
+  "nicoletta":"Vittoria del popolo",
+  "nicolo":"Vittoria del popolo",
+  "nicolò":"Vittoria del popolo",
+  "nina":"Piccola",
+  "nino":"Ipocoristico (da Antonio, Giannino…)",
+  "noa":"Movimento / quiete",
+  "noah":"Riposo",
+  "noe":"Riposo, consolazione",
+  "noemi":"Dolcezza",
+  "nora":"Onore / luce",
+  "norma":"Regola",
+  "noè":"Riposo, consolazione",
+  "nunzia":"Annunciatrice, messaggera",
+  "nunzio":"Annunciatore, messaggero",
+  "octavia":"Ottava",
+  "oddone":"Ricchezza, prosperità",
+  "oderzo":"Toponimo veneto (raro)",
+  "odysseus":"Viaggiatore",
+  "olga":"Santa, benedetta",
+  "olimpia":"Dell'Olimpo",
+  "olindo":"Letterario (Gerusalemme liberata)",
+  "oliver":"Ulivo / elfo guerriero (etimologie multiple)",
+  "olivia":"Ulivo, pace",
+  "olivier":"Ulivo",
+  "oliviero":"Ulivo / elfo guerriero",
+  "olympus":"Olimpo",
+  "onofria":"Sempre felice (forma femminile di Onofrio)",
+  "onofrio":"Colui che è sempre felice (etimologia egizia/greca)",
+  "orazio":"Della gens Horatia / veggente del tempo",
+  "orfeo":"Oscuro / mitico cantore (etimologia discussa)",
+  "orlando":"Famoso nella terra",
+  "ormisda":"Nome persiano storico/santo",
+  "orsola":"Piccola orsa",
+  "orsolino":"Piccolo orso",
+  "ortensia":"Giardino",
+  "oscar":"Lancia divina",
+  "osvaldo":"Potere divino",
+  "oswald":"Divino governante",
+  "ottavia":"Ottava, nata l'ottavo giorno",
+  "ottaviano":"Della gens Ottavia",
+  "ottavio":"Ottavo",
+  "otto":"Ricchezza",
+  "ottone":"Ricchezza",
+  "pablo":"Piccolo",
+  "palmira":"Della palma / pellegrina",
+  "palmiro":"Pellegrino / della palma",
+  "pancrazio":"Onnipotente, che tutto può",
+  "pandora":"Tutti i doni (mitologico)",
+  "panfilo":"Amico di tutti",
+  "paola":"Piccola",
+  "paolo":"Piccolo",
+  "pasqua":"Pasqua, passaggio",
+  "pasquale":"Pasqua",
+  "pasqualina":"Della Pasqua (forma femminile)",
+  "patricia":"Nobile",
+  "patrick":"Nobile",
+  "patrizia":"Nobile, di stirpe patrizia",
+  "patrizio":"Nobile",
+  "paul":"Piccolo",
+  "paula":"Piccola",
+  "pellegrina":"Pellegrina, forestiera",
+  "pellegrino":"Pellegrino, forestiero",
+  "penelope":"Tessitrice fedele",
+  "peppino":"Dio aggiungerà (ipocoristico)",
+  "pericle":"Gloria ampia",
+  "persefone":"Colei che porta la distruzione (mitologico)",
+  "peter":"Roccia",
+  "petra":"Roccia",
+  "petronilla":"Della gens Petronia",
+  "petronio":"Della gens Petronia",
+  "philip":"Amante dei cavalli",
+  "philippa":"Amante dei cavalli (forma femminile)",
+  "philippe":"Amante dei cavalli",
+  "pia":"Pia, devota",
+  "pier":"Roccia",
+  "piera":"Roccia",
+  "pierangelo":"Pietro e Angelo",
+  "piergiorgio":"Pietro e Giorgio",
+  "pierluigi":"Pietro e Luigi",
+  "piermario":"Pietro e Mario",
+  "piero":"Roccia",
+  "pierpaolo":"Composto da Pietro e Paolo",
+  "pierre":"Roccia",
+  "pietra":"Roccia",
+  "pietro":"Roccia, solido, affidabile",
+  "pilar":"Colonna (Madonna del Pilar)",
+  "pina":"Dio aggiungerà (ipocoristico)",
+  "pio":"Pio, devoto",
+  "placida":"Placida, calma",
+  "placido":"Placido, calmo",
+  "platon":"Ampio, dalle spalle larghe",
+  "platone":"Ampio",
+  "polidoro":"Dai molti doni",
+  "pompeo":"Della gens Pompeia",
+  "ponzio":"Della gens Pontia / del mare",
+  "porfirio":"Purpureo",
+  "primo":"Primo",
+  "principia":"Principio",
+  "priscilla":"Antica",
+  "prospera":"Prospera",
+  "prospero":"Prospero, fortunato",
+  "prudenzio":"Prudente",
+  "quinto":"Quinto",
+  "quirina":"Di Quirino (forma femminile)",
+  "quirino":"Di Quirino",
+  "rachel":"Pecora",
+  "rachele":"Pecora, mite",
+  "raffaele":"Dio guarisce, medico di Dio",
+  "raffaella":"Dio guarisce",
+  "raffaello":"Dio guarisce",
+  "raimonda":"Protettrice saggia",
+  "raimondo":"Protettore saggio, consiglio protettivo",
+  "rainero":"Consiglio dell'esercito",
+  "ranieri":"Consiglio dell'esercito",
+  "raniero":"Consiglio dell'esercito",
+  "raoul":"Lupo del consiglio",
+  "raphael":"Dio guarisce",
+  "raul":"Lupo del consiglio",
+  "raymond":"Consiglio protettivo",
+  "rebeca":"Che lega",
+  "rebecca":"Che lega",
+  "redenta":"Redenta",
+  "redento":"Redento",
+  "regina":"Regina",
+  "remigia":"Rematrice (forma femminile di Remigio)",
+  "remigio":"Rematore, remigante",
+  "remo":"Fondatore di Roma (mitologico)",
+  "renata":"Rinata, nata di nuovo",
+  "renato":"Rinato",
+  "rene":"Rinato",
+  "renzo":"Variante di Lorenzo",
+  "rené":"Rinato",
+  "renée":"Rinata",
+  "resurrezione":"Resurrezione (raro)",
+  "rex":"Re",
+  "riccardo":"Re forte",
+  "richard":"Potente condottiero",
+  "rina":"Ipocoristico (da Caterina, Sabrina…)",
+  "rino":"Ipocoristico (da Gennaro, Marino…)",
+  "rita":"Perla",
+  "robert":"Splendente per la gloria",
+  "roberta":"Gloria splendente",
+  "roberto":"Gloria splendente",
+  "robin":"Fama / pettirosso",
+  "rocco":"Riposo / corvo (etimologia germanica discussa)",
+  "rodolfo":"Lupo glorioso",
+  "rodrigo":"Gloria potente, famoso regnante",
+  "rodrigue":"Gloria potente",
+  "roger":"Lancia gloriosa",
+  "roland":"Famoso nel paese",
+  "rolando":"Fama della terra",
+  "romana":"Romana",
+  "romano":"Di Roma",
+  "romeo":"Pellegrino a Roma, romano",
+  "romilda":"Guerriera gloriosa",
+  "romina":"Piccola romana / moderna",
+  "romola":"Di Roma (forma femminile di Romolo)",
+  "romolo":"Di Roma, fondatore",
+  "romualda":"Gloria regale (forma femminile)",
+  "romualdo":"Gloria regale",
+  "rosa":"Rosa",
+  "rosalba":"Rosa all'alba",
+  "rosalia":"Rosa",
+  "rosalind":"Rosa delicata",
+  "rosanna":"Rosa e Anna",
+  "rosaria":"Del rosario, rosa",
+  "rosario":"Rosario",
+  "rose":"Rosa",
+  "rosie":"Rosa",
+  "rosita":"Piccola rosa",
+  "rossana":"Luminosa, alba",
+  "rossella":"Piccola rossa / rosa",
+  "roxana":"Luminosa, alba (persiano)",
+  "roxane":"Luminosa",
+  "rudolf":"Lupo glorioso",
+  "rufus":"Rosso",
+  "ruggero":"Lancia gloriosa",
+  "ruggiero":"Lancia gloriosa",
+  "rut":"Amica, compagna",
+  "ruth":"Amica",
+  "sabatino":"Nato di sabato",
+  "sabato":"Nato di sabato",
+  "sabina":"Sabina",
+  "sabino":"Sabino",
+  "sabrina":"Principessa, fiume leggendario",
+  "sally":"Principessa (da Sara)",
+  "salomone":"Pace, pacifico",
+  "salvatore":"Salvatore",
+  "salvatrice":"Salvatrice, colei che salva",
+  "salvo":"Salvo, salvato",
+  "sam":"Nome di Dio / ascoltato (ipocoristico)",
+  "samanta":"Ascoltatrice / nome moderno",
+  "samantha":"Ascoltatrice (moderno)",
+  "samson":"Sole, piccolo sole",
+  "samuel":"Nome di Dio",
+  "samuele":"Il suo nome è Dio",
+  "sandra":"Protettore degli uomini",
+  "sandro":"Protettore (da Alessandro)",
+  "sansone":"Sole",
+  "santa":"Santa",
+  "sante":"Santo",
+  "santina":"Piccola santa",
+  "santino":"Piccolo santo",
+  "santo":"Santo",
+  "santolo":"Santo (dialettale)",
+  "sara":"Principessa",
+  "sarah":"Principessa",
+  "saul":"Chiesto, invocato",
+  "saulo":"Chiesto, invocato",
+  "savannah":"Pianura, savana (moderno)",
+  "saveria":"Casa nuova (forma femminile di Saverio)",
+  "saverio":"Casa nuova, nuovo castello",
+  "scarlett":"Rosso scarlatto",
+  "sebastian":"Venerabile",
+  "sebastiana":"Venerabile",
+  "sebastiano":"Venerabile, degno di rispetto",
+  "secondina":"Seconda",
+  "secondo":"Secondo",
+  "selena":"Luna",
+  "selene":"Luna",
+  "serafina":"Serafino, fiamma celeste",
+  "serafino":"Serafino",
+  "serena":"Serena",
+  "sergio":"Della gens Sergia",
+  "serio":"Serio",
+  "set":"Posto, sostituto (biblico)",
+  "severa":"Severa",
+  "severina":"Severa",
+  "severino":"Severo, rigoroso",
+  "severo":"Severo",
+  "shannon":"Antica, fiume irlandese",
+  "sharon":"Pianura fertile",
+  "sheila":"Cieca / da Cecilia (irlandese)",
+  "shirley":"Prato luminoso",
+  "siegfried":"Pace vittoriosa",
+  "sigfrido":"Pace vittoriosa",
+  "sigismonda":"Protettrice vittoriosa",
+  "sigismondo":"Protettore vittorioso",
+  "silvana":"Dei boschi (forma femminile)",
+  "silvano":"Dei boschi",
+  "silvestra":"Della selva (forma femminile)",
+  "silvestro":"Della selva, campestre",
+  "silvia":"Della selva",
+  "silvio":"Della selva",
+  "simeone":"Colui che ascolta",
+  "simon":"Colui che ascolta",
+  "simona":"Colei che ascolta",
+  "simone":"Colui che ascolta",
+  "simonetta":"Colei che ascolta",
+  "sisto":"Sesto / levigato (papi)",
+  "sky":"Cielo (moderno)",
+  "soave":"Soave, dolce",
+  "soccorso":"Soccorso (Madonna del Soccorso)",
+  "sofia":"Saggezza",
+  "solange":"Solenne (francese)",
+  "sole":"Sole, luce e calore",
+  "solomon":"Pace",
+  "sonia":"Saggezza",
+  "sophia":"Saggezza",
+  "sophie":"Saggezza",
+  "speranza":"Speranza",
+  "stanislao":"Diventa glorioso, gloria dello Stato",
+  "stanislava":"Gloria dello Stato (forma femminile)",
+  "stefania":"Coronata",
+  "stefano":"Coronato",
+  "stella":"Stella",
+  "stenio":"Forza (da Demostene ecc.)",
+  "stephanie":"Coronata",
+  "stephen":"Coronato",
+  "susan":"Giglio",
+  "susanna":"Giglio",
+  "suzanne":"Giglio",
+  "svetlana":"Luce, stella (slavo)",
+  "sylvester":"Della selva",
+  "sylvia":"Della selva",
+  "taddea":"Coraggio, lode (forma femminile di Taddeo)",
+  "taddeo":"Coraggio, lode (etimologia discussa)",
+  "tamara":"Palma",
+  "tancredi":"Pensiero grato, consiglio",
+  "tania":"Dalla regina / da Tatiana",
+  "tanya":"Da Tatiana",
+  "tarquinio":"Di Tarquinia",
+  "tatiana":"Della gens Tazia, regale",
+  "taylor":"Sarto (moderno)",
+  "tazio":"Nome sabino",
+  "tecla":"Gloria di Dio",
+  "telma":"Volontà, desiderio (moderno/letterario)",
+  "teo":"Dio",
+  "teobalda":"Popolo audace (forma femminile)",
+  "teobaldo":"Popolo audace",
+  "teodora":"Dono di Dio",
+  "teodorico":"Re del popolo",
+  "teodoro":"Dono di Dio",
+  "teodosia":"Data da Dio",
+  "teodosio":"Dato da Dio",
+  "teofila":"Amica di Dio",
+  "teofilo":"Amico di Dio",
+  "terenzio":"Della gens Terentia",
+  "teresa":"Mietitrice",
+  "tess":"Mietitrice (ipocoristico)",
+  "thaddeus":"Coraggio",
+  "theobald":"Popolo audace",
+  "theodore":"Dono di Dio",
+  "theresa":"Mietitrice",
+  "therese":"Mietitrice",
+  "tiberio":"Del Tevere",
+  "tiffany":"Epifania, manifestazione",
+  "tina":"Ipocoristico (da Cristina, Valentina…)",
+  "tito":"Titolo / onore (etimologia discussa)",
+  "titus":"Onore",
+  "tiziana":"Della gens Titia",
+  "tiziano":"Della gens Titia",
+  "tobia":"Dio è buono",
+  "tobias":"Dio è buono",
+  "tommaso":"Gemello",
+  "tonio":"Inestimabile (ipocoristico)",
+  "tony":"Inestimabile (ipocoristico)",
+  "tracy":"Dai trevi / guerriera (etimologie multiple)",
+  "tullia":"Della gens Tullia",
+  "tullio":"Della gens Tullia",
+  "ugo":"Intelletto",
+  "ulderica":"Potere ereditario (forma femminile)",
+  "ulderico":"Potere ereditario",
+  "ulisse":"Odisseo, viaggiatore",
+  "ulrico":"Potere ereditario",
+  "umberta":"Guerriera famosa (forma femminile di Umberto)",
+  "umberto":"Guerriero famoso",
+  "urbana":"Cittadina, urbana",
+  "urbano":"Cittadino",
+  "ursula":"Piccola orsa",
+  "valentina":"Forte e sana",
+  "valentino":"Forte e sano",
+  "valeria":"Forte",
+  "valerio":"Forte",
+  "valter":"Capo dell'esercito",
+  "vanessa":"Nome letterario (Swift), farfalla",
+  "vasco":"Corvo / basco (etimologie multiple)",
+  "venanzo":"Cacciatore (santo)",
+  "venera":"Venere, amore",
+  "veneranda":"Venerabile (forma femminile)",
+  "venerando":"Venerabile",
+  "venere":"Amore, bellezza (dea)",
+  "vera":"Vera, fede",
+  "vero":"Vero, sincero",
+  "veronica":"Vera immagine",
+  "vespasiano":"Della gens Vespasia",
+  "victoria":"Vittoria",
+  "vincent":"Vincente",
+  "vincenza":"Vincente",
+  "vincenzo":"Vincente",
+  "viola":"Viola",
+  "violet":"Viola",
+  "violetta":"Piccola viola",
+  "virgil":"Della gens Vergilia",
+  "virgilia":"Della gens Virgiliana",
+  "virgilio":"Della gens Vergilia",
+  "virginia":"Pura",
+  "vita":"Vita",
+  "vito":"Vita",
+  "vittore":"Vincitore",
+  "vittoria":"Vittoria",
+  "vittorio":"Vittorioso",
+  "vivian":"Vivace",
+  "viviana":"Vivace",
+  "viviano":"Vivace",
+  "waldo":"Potere, governo",
+  "walter":"Capo dell'esercito",
+  "wendy":"Amica (letterario moderno)",
+  "werner":"Difensore dell'esercito",
+  "whitney":"Isola bianca",
+  "wilhelm":"Volontà con elmo",
+  "william":"Volontà con elmo",
+  "wilma":"Volontà con elmo",
+  "xavier":"Casa nuova",
+  "xenon":"Straniero, ospite",
+  "yuri":"Contadino (da Georgij)",
+  "yvonne":"Tasso, arciere (germanico via francese)",
+  "zaccaria":"Dio si è ricordato",
+  "zachary":"Dio si è ricordato",
+  "zaira":"Fiore / luminosa (letterario)",
+  "zechariah":"Dio si è ricordato",
+  "zita":"Fanciulla, piccola (santo nome toscano)",
+  "zoe":"Vita",
+  "zoia":"Vita"
+};
+
+// ============================================================
+// FUNZIONI ASTROLOGICHE (NON MODIFICATE)
+// ============================================================
+function getZodiac(month, day) {
+  for (const z of ZODIAC) {
+    const [sm, sd] = z.start; const [em, ed] = z.end;
+    if (sm === 12 && em === 1) { if ((month === 12 && day >= sd) || (month === 1 && day <= ed)) return z; }
+    else { if ((month === sm && day >= sd) || (month === em && day <= ed) || (month > sm && month < em)) return z; }
+  }
+  return ZMAP["Ariete"];
+}
+function getChinese(year){ const name = CHINESE[year % 12]; const element = CHINESE_ELEMENTS[(year - 4) % 10]; return {name, emoji: CHINESE_EMOJI[name]||"⭐", element}; }
+function lifePathNumber(dateStr){ const digits = dateStr.replace(/\D/g,'').split('').map(Number); let n = digits.reduce((a,b)=>a+b,0); while(n>9 && ![11,22,33].includes(n)) n = String(n).split('').reduce((a,b)=>a+ +b,0); return n; }
+function seasonFor(month, day){ if ((month===12 && day>=21) || month<=2 || (month===3 && day<20)) return {name:"Inverno", emoji:"❄️"}; if ((month>=3 && day>=20) || month===4 || month===5 || (month===6 && day<21)) return {name:"Primavera", emoji:"🌷"}; if ((month>=6 && day>=21) || month===7 || month===8 || (month===9 && day<23)) return {name:"Estate", emoji:"☀️"}; return {name:"Autunno", emoji:"🍂"}; }
+function moonPhase(date){
+  const lp = 2551443; const new_moon = new Date('2000-01-06T18:14:00Z').getTime()/1000;
+  const phase = ((date.getTime()/1000 - new_moon) % lp) / lp; const p = phase < 0 ? phase + 1 : phase;
+  const names = [[0.03,"Luna Nuova","🌑","Nuovi inizi"],[0.22,"Falce Crescente","🌒","Energia in crescita"],[0.28,"Primo Quarto","🌓","Decisione"],[0.47,"Gibbosa Crescente","🌔","Rifinitura"],[0.53,"Luna Piena","🌕","Culmine"],[0.72,"Gibbosa Calante","🌖","Condivisione"],[0.78,"Ultimo Quarto","🌗","Rilascio"],[0.97,"Falce Calante","🌘","Riposo"],[1.01,"Luna Nuova","🌑","Nuovi inizi"]];
+  const f = names.find(n=> p < n[0]) || names[names.length-1];
+  return {name:f[1], emoji:f[2], desc:f[3], pct:Math.round(p*100)};
+}
+function compatDetail(signA, signB){
+  const za = ZMAP[signA], zb = ZMAP[signB];
+  const love = (COMPAT_MATRIX[signA]?.[signB] ?? 60);
+  const friendship = Math.min(95, love + (za.el === zb.el ? 8 : -3));
+  const work = Math.min(96, 55 + (za.mode === zb.mode ? 18 : 7) + (za.el === zb.el ? 10 : 0));
+  const trust = Math.max(35, 92 - Math.abs(ORDER.indexOf(signA) - ORDER.indexOf(signB))*4);
+  const elementMatch = za.el === zb.el ? "Stesso elemento" : ((za.el==="Fuoco" && zb.el==="Aria")||(za.el==="Aria" && zb.el==="Fuoco")||(za.el==="Terra" && zb.el==="Acqua")||(za.el==="Acqua" && zb.el==="Terra")) ? "Elementi complementari" : "Elementi in tensione";
+  return {love, friendship, work, trust, elementMatch, modeA:za.mode, modeB:zb.mode, elA:za.el, elB:zb.el};
+}
+function chineseCompat(a,b){ const ia = CHINESE.indexOf(a), ib = CHINESE.indexOf(b); const diff = Math.abs(ia-ib); if(diff===0) return 82; if([4,8].includes(diff)) return 88; if(diff===6) return 38; return 62; }
+function buildPersonalSummary(r){
+  const tone = r.zodiac.el === "Fuoco" ? "energia creativa, slancio e bisogno di esprimerti" :
+    r.zodiac.el === "Terra" ? "concretezza, stabilità e senso pratico" :
+    r.zodiac.el === "Aria" ? "curiosità, comunicazione e apertura mentale" :
+    "sensibilità, intuito e profondità emotiva";
+  return `${r.name} è nato/a di ${r.weekday} ${r.weekdayEmoji}: ${WEEK_NOTES[r.weekdayIdx].toLowerCase()} Nasce sotto il segno ${r.zodiac.emoji} ${r.zodiac.name}, con una dominante di ${tone}. Il numero destino ${r.lifePath} aggiunge una chiave personale al percorso. L’ascendente, quando data, ora e luogo sono corretti, completa la lettura con il modo in cui la persona si presenta.`;
+}
+
+// ============================================================
+// EFFEMERIDI FALLBACK (BROWSER) – NON MODIFICARE
+// ============================================================
+const PLANET_LABELS = ["Sole","Luna","Mercurio","Venere","Marte","Giove","Saturno","Urano","Nettuno","Plutone","Nodo Nord"];
+const PLANET_ICONS = {Sole:"☉", Luna:"☽", Mercurio:"☿", Venere:"♀", Marte:"♂", Giove:"♃", Saturno:"♄", Urano:"♅", Nettuno:"♆", Plutone:"♇", "Nodo Nord":"☊", Ascendente:"↑", "Medio Cielo":"MC"};
+function julianDate(date){ return date.getTime() / 86400000 + 2440587.5; }
+function normalizeDeg(d){ return ((d % 360) + 360) % 360; }
+function normalize180(d){ const x = normalizeDeg(d); return x > 180 ? x - 360 : x; }
+function rad(d){ return d * Math.PI / 180; }
+function deg(r){ return r * 180 / Math.PI; }
+function daysSinceJ2000(date){ return julianDate(date) - 2451543.5; }
+function kepler(Mdeg, e){
+  const M = rad(normalizeDeg(Mdeg));
+  let E = M + e*Math.sin(M)*(1 + e*Math.cos(M));
+  for(let i=0;i<8;i++) E = E - (E - e*Math.sin(E) - M)/(1 - e*Math.cos(E));
+  return E;
+}
+function orbitalElements(body, d){
+  const E = {
+    Mercury:{N:48.3313+3.24587e-5*d, i:7.0047+5.00e-8*d, w:29.1241+1.01444e-5*d, a:0.387098, e:0.205635+5.59e-10*d, M:168.6562+4.0923344368*d},
+    Venus:{N:76.6799+2.46590e-5*d, i:3.3946+2.75e-8*d, w:54.8910+1.38374e-5*d, a:0.723330, e:0.006773-1.302e-9*d, M:48.0052+1.6021302244*d},
+    Earth:{N:0, i:0, w:282.9404+4.70935e-5*d, a:1.000000, e:0.016709-1.151e-9*d, M:356.0470+0.9856002585*d},
+    Mars:{N:49.5574+2.11081e-5*d, i:1.8497-1.78e-8*d, w:286.5016+2.92961e-5*d, a:1.523688, e:0.093405+2.516e-9*d, M:18.6021+0.5240207766*d},
+    Jupiter:{N:100.4542+2.76854e-5*d, i:1.3030-1.557e-7*d, w:273.8777+1.64505e-5*d, a:5.20256, e:0.048498+4.469e-9*d, M:19.8950+0.0830853001*d},
+    Saturn:{N:113.6634+2.38980e-5*d, i:2.4886-1.081e-7*d, w:339.3939+2.97661e-5*d, a:9.55475, e:0.055546-9.499e-9*d, M:316.9670+0.0334442282*d},
+    Uranus:{N:74.0005+1.3978e-5*d, i:0.7733+1.9e-8*d, w:96.6612+3.0565e-5*d, a:19.18171-1.55e-8*d, e:0.047318+7.45e-9*d, M:142.5905+0.011725806*d},
+    Neptune:{N:131.7806+3.0173e-5*d, i:1.7700-2.55e-7*d, w:272.8461-6.027e-6*d, a:30.05826+3.313e-8*d, e:0.008606+2.15e-9*d, M:260.2471+0.005995147*d},
+    Pluto:{N:110.30347, i:17.14175, w:113.76329, a:39.48168677, e:0.24880766, M:14.53+0.0039757*d}
+  };
+  return E[body];
+}
+function heliocentricCoords(body, d){
+  const el = orbitalElements(body, d);
+  const E = kepler(el.M, el.e);
+  const xv = el.a * (Math.cos(E) - el.e);
+  const yv = el.a * (Math.sqrt(1 - el.e*el.e) * Math.sin(E));
+  const v = deg(Math.atan2(yv, xv));
+  const r = Math.sqrt(xv*xv + yv*yv);
+  const N = rad(el.N), i = rad(el.i), vw = rad(v + el.w);
+  const xh = r * (Math.cos(N)*Math.cos(vw) - Math.sin(N)*Math.sin(vw)*Math.cos(i));
+  const yh = r * (Math.sin(N)*Math.cos(vw) + Math.cos(N)*Math.sin(vw)*Math.cos(i));
+  const zh = r * (Math.sin(vw)*Math.sin(i));
+  return {x:xh, y:yh, z:zh, r, lon:normalizeDeg(deg(Math.atan2(yh, xh)))};
+}
+function moonLongitudeApprox(date){
+  const d = daysSinceJ2000(date);
+  const N = 125.1228 - 0.0529538083*d;
+  const i = 5.1454;
+  const w = 318.0634 + 0.1643573223*d;
+  const a = 60.2666;
+  const e = 0.054900;
+  const M = 115.3654 + 13.0649929509*d;
+  const E = kepler(M, e);
+  const xv = a * (Math.cos(E) - e);
+  const yv = a * (Math.sqrt(1-e*e) * Math.sin(E));
+  const v = deg(Math.atan2(yv, xv));
+  const r = Math.sqrt(xv*xv + yv*yv);
+  const xh = r * (Math.cos(rad(N))*Math.cos(rad(v+w)) - Math.sin(rad(N))*Math.sin(rad(v+w))*Math.cos(rad(i)));
+  const yh = r * (Math.sin(rad(N))*Math.cos(rad(v+w)) + Math.cos(rad(N))*Math.sin(rad(v+w))*Math.cos(rad(i)));
+  let lon = normalizeDeg(deg(Math.atan2(yh, xh)));
+  const Ms = normalizeDeg(356.0470 + 0.9856002585*d);
+  const Mm = normalizeDeg(M);
+  const D = normalizeDeg(lon - (normalizeDeg(282.9404 + 4.70935e-5*d + Ms)));
+  const F = normalizeDeg(lon - N);
+  lon += -1.274*Math.sin(rad(Mm - 2*D)) + 0.658*Math.sin(rad(2*D)) - 0.186*Math.sin(rad(Ms));
+  lon += -0.059*Math.sin(rad(2*Mm - 2*D)) - 0.057*Math.sin(rad(Mm - 2*D + Ms)) + 0.053*Math.sin(rad(Mm + 2*D));
+  lon += 0.046*Math.sin(rad(2*D - Ms)) + 0.041*Math.sin(rad(Mm - Ms)) - 0.031*Math.sin(rad(Mm + Ms));
+  lon += -0.015*Math.sin(rad(2*F - 2*D)) + 0.011*Math.sin(rad(Mm - 4*D));
+  return normalizeDeg(lon);
+}
+function planetLongitude(body, date){
+  if(body === 'Luna') return moonLongitudeApprox(date);
+  const d = daysSinceJ2000(date);
+  const earth = heliocentricCoords('Earth', d);
+  if(body === 'Sole') return normalizeDeg(earth.lon);
+  if(body === 'Nodo Nord') return normalizeDeg(125.1228 - 0.0529538083*d);
+  const key = {Mercurio:'Mercury', Venere:'Venus', Marte:'Mars', Giove:'Jupiter', Saturno:'Saturn', Urano:'Uranus', Nettuno:'Neptune', Plutone:'Pluto'}[body];
+  const p = heliocentricCoords(key, d);
+  return normalizeDeg(deg(Math.atan2(p.y + earth.y, p.x + earth.x)));
+}
+function isRetrograde(body, date){
+  if(body === 'Sole' || body === 'Luna') return false;
+  const d1 = planetLongitude(body, new Date(date.getTime() - 86400000));
+  const d2 = planetLongitude(body, new Date(date.getTime() + 86400000));
+  return (normalizeDeg(d2) - normalizeDeg(d1) + 540) % 360 - 180 < 0;
+}
+function zodiacFromDegree(lon){
+  if(lon == null) return {sign:'—', degree:null, text:'—'};
+  const sign = ORDER[Math.floor(normalizeDeg(lon)/30)];
+  const degree = Math.floor(normalizeDeg(lon) % 30);
+  const minute = Math.floor((normalizeDeg(lon)%1)*60);
+  return {sign, degree, minute, text:`${degree}°${String(minute).padStart(2,'0')}′ ${sign}`};
+}
+function ephemerisPositions(date){
+  const out = {};
+  PLANET_LABELS.forEach(body=>{
+    const lon = planetLongitude(body, date);
+    const zd = zodiacFromDegree(lon);
+    out[body] = {body, longitude:lon, sign:zd.sign, degree:zd.degree, minute:zd.minute, text:zd.text, retrograde:isRetrograde(body, date)};
+  });
+  return out;
+}
+function aspectBetween(lonA, lonB){
+  if(lonA == null || lonB == null) return null;
+  const diff = Math.abs(normalize180(lonB - lonA));
+  const aspects = [
+    {name:'congiunzione', angle:0, orb:7, score:6},
+    {name:'sestile', angle:60, orb:4, score:3},
+    {name:'quadratura', angle:90, orb:5, score:5},
+    {name:'trigono', angle:120, orb:5, score:4},
+    {name:'opposizione', angle:180, orb:6, score:6}
+  ];
+  let best = null;
+  for(const a of aspects){
+    const orb = Math.abs(diff - a.angle);
+    if(orb <= a.orb && (!best || orb < best.orb)) best = {...a, orb};
+  }
+  return best;
+}
+function findMajorTransits(r, date=new Date()){
+  const transits = ephemerisPositions(date);
+  const natal = r.planetDetails || {};
+  const targets = ['Sole','Luna','Ascendente','Mercurio','Venere','Marte'];
+  const movers = ['Luna','Sole','Mercurio','Venere','Marte','Giove','Saturno'];
+  const found=[];
+  movers.forEach(t=>{
+    targets.forEach(n=>{
+      if(!transits[t] || !natal[n] || natal[n].longitude == null) return;
+      const asp = aspectBetween(transits[t].longitude, natal[n].longitude);
+      if(asp){
+        found.push({transit:t, natal:n, aspect:asp.name, orb:asp.orb, score:asp.score + (t==='Luna'?0:t==='Sole'?1:2), text:asp.name});
+      }
+    });
+  });
+  return found.sort((a,b)=> (b.score - a.score) || (a.orb - b.orb)).slice(0,4);
+}
+function ascendantLongitude(date, latitude, longitude){
+  const jd = julianDate(date);
+  const T = (jd - 2451545.0) / 36525;
+  const gmst = normalizeDeg(280.46061837 + 360.98564736629*(jd - 2451545.0) + 0.000387933*T*T - T*T*T/38710000);
+  const lst = normalizeDeg(gmst + longitude);
+  const eps = 23.439291 - 0.0130042*T;
+  const phi = rad(latitude);
+  function altitude(lambda){
+    const l = rad(lambda), e = rad(eps);
+    const ra = normalizeDeg(deg(Math.atan2(Math.sin(l)*Math.cos(e), Math.cos(l))));
+    const dec = deg(Math.asin(Math.sin(e)*Math.sin(l)));
+    const H = rad(normalize180(lst - ra));
+    const de = rad(dec);
+    return Math.asin(Math.sin(phi)*Math.sin(de) + Math.cos(phi)*Math.cos(de)*Math.cos(H));
+  }
+  const roots=[];
+  let prevL=0, prev=altitude(0);
+  for(let l=1; l<=360; l++){
+    const cur=altitude(l);
+    if(prev===0 || cur===0 || prev*cur<0){
+      let a=prevL, b=l, fa=prev;
+      for(let i=0;i<40;i++){
+        const mid=(a+b)/2, fm=altitude(mid);
+        if(fa*fm<=0){ b=mid; } else { a=mid; fa=fm; }
+      }
+      roots.push(normalizeDeg((a+b)/2));
+    }
+    prevL=l; prev=cur;
+  }
+  for(const root of roots){
+    const l = rad(root), e = rad(eps);
+    const ra = normalizeDeg(deg(Math.atan2(Math.sin(l)*Math.cos(e), Math.cos(l))));
+    const H = normalize180(lst - ra);
+    if(H < 0) return root;
+  }
+  return roots[0] ?? null;
+}
+
+// ============================================================
+// BACKEND SWISS EPHEMERIS (opzionale)
+// ============================================================
+function backendBaseUrl(){ const saved = localStorage.getItem('cb_backend_url'); if(saved) return saved.replace(/\/$/,''); if(location.protocol === 'http:' || location.protocol === 'https:') return location.origin; return ''; }
+
+async function checkBackendStatus(){
+  const el = document.getElementById('backendStatus');
+  const input = document.getElementById('backendUrlInput');
+  if(!el) return false;
+  const base = backendBaseUrl();
+  if(input && document.activeElement !== input){
+    const saved = localStorage.getItem('cb_backend_url') || '';
+    input.value = saved;
+    input.placeholder = base ? `Vuoto = ${base}` : 'Es. http://localhost:8765';
+  }
+  if(!base){
+    el.innerHTML = '⚠️ Nessun backend configurato. Calcolo solo nel browser.';
+    el.style.color = 'var(--yellow)';
+    return false;
+  }
+  el.textContent = 'Controllo backend Swiss Ephemeris…';
+  el.style.color = 'var(--muted)';
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 60000); // 60s: cold start Render Free
+  try{
+    const res = await fetch(`${base}/api/health`, { signal: controller.signal, cache: 'no-store' });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const ver = data.engine_version || data.version || '';
+    el.innerHTML = `✅ Backend attivo · <strong>Swiss Ephemeris ${ver}</strong><br><span style="opacity:.85">${base}</span>`;
+    el.style.color = 'var(--green)';
+    return true;
+  }catch(err){
+    el.innerHTML = `❌ Backend non raggiungibile su <code>${base}</code>. Uso fallback browser.<br><span style="opacity:.85">Se usi Render Free, attendi 30–60s (cold start) e premi ↻. In locale: avvia <code>avvia.bat</code>.</span>`;
+    el.style.color = 'var(--red)';
+    return false;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+function initBackendUi(){
+  const saveBtn = document.getElementById('btnSaveBackendUrl');
+  const checkBtn = document.getElementById('btnCheckBackend');
+  const input = document.getElementById('backendUrlInput');
+  if(saveBtn){
+    saveBtn.onclick = ()=>{
+      const v = (input?.value || '').trim().replace(/\/$/,'');
+      if(v) localStorage.setItem('cb_backend_url', v);
+      else localStorage.removeItem('cb_backend_url');
+      checkBackendStatus();
+    };
+  }
+  if(checkBtn) checkBtn.onclick = ()=> checkBackendStatus();
+  checkBackendStatus();
+}
+
+async function fetchSwissNatal({name, birthdateStr, birthtimeStr, place, location}){
+  const base = backendBaseUrl();
+  if(!base || !birthtimeStr || !location?.lat || !location?.lon || !location?.timezone) return null;
+  const controller = new AbortController(); const timer = setTimeout(()=>controller.abort(), 90000); // 90s cold start
+  try{
+    const res = await fetch(`${base}/api/natal`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, signal:controller.signal,
+      body: JSON.stringify({name, date:birthdateStr, time:birthtimeStr, place, lat:location.lat, lon:location.lon, timezone:location.timezone, house_system:'P'})
+    });
+    if(!res.ok) throw new Error(await res.text());
+    return await res.json();
+  }catch(err){ console.warn('Swiss Ephemeris backend non disponibile, uso fallback browser:', err); return null; }finally{ clearTimeout(timer); }
+}
+function swissToPlanetDetails(planets){
+  const out = {};
+  Object.entries(planets || {}).forEach(([name, data])=>{
+    out[name] = {body:name, longitude:data.longitude, sign:data.sign, degree:data.degree, minute:data.minute, text:data.text, retrograde:!!data.retrograde, speed:data.speed??null, swiss:true};
+  });
+  return out;
+}
+function swissTransitText(t){ if(!t) return 'nessun transito principale stretto'; return `${t.transit} ${t.aspect} ${t.natal} (${Number(t.orb).toFixed(1)}°)`; }
+
+// ============================================================
+// GEOLOCALIZZAZIONE
+// ============================================================
+let birthLocation = null;
+function setPlaceStatus(msg, isError=false){ const el = document.getElementById('t_timehint'); if(el){ el.textContent = msg; el.style.color = isError ? 'var(--red)' : 'var(--muted)'; } }
+function renderPlaceResults(results){
+  const box = document.getElementById('placeResults');
+  box.innerHTML = ''; box.style.display = 'none';
+  if(!results || !results.length) return;
+  results.forEach(item=>{
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'btn'; btn.style.width='100%'; btn.style.textAlign='left';
+    const label = [item.name, item.admin1, item.country].filter(Boolean).join(', ');
+    btn.innerHTML = `<strong>${label}</strong><br><small>${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)} · ${item.timezone || 'timezone non disponibile'}</small>`;
+    btn.onclick = ()=> selectBirthLocation(item);
+    box.appendChild(btn);
+  });
+  box.style.display = 'flex';
+}
+function selectBirthLocation(item){
+  const label = [item.name, item.admin1, item.country].filter(Boolean).join(', ');
+  birthLocation = {name:label, lat:item.latitude, lon:item.longitude, timezone:item.timezone};
+  document.getElementById('place').value = label;
+  document.getElementById('placeResults').style.display = 'none';
+  const det = document.getElementById('locationDetails');
+  det.style.display = 'block';
+  det.innerHTML = `<strong>Luogo selezionato:</strong> ${label}<br>Coordinate: ${birthLocation.lat.toFixed(4)}, ${birthLocation.lon.toFixed(4)} · Fuso: ${birthLocation.timezone}`;
+  setPlaceStatus('Luogo di nascita selezionato. Ora posso calcolare l’ascendente reale.');
+}
+async function geocodeBirthPlace(silent=false){
+  const q = document.getElementById('place').value.trim();
+  if(!q){ setPlaceStatus('Inserisci il luogo di nascita per calcolare l’ascendente.', true); return null; }
+  setPlaceStatus('Cerco coordinate e fuso orario del luogo di nascita...');
+  try{
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=it&format=json`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('servizio non disponibile');
+    const data = await res.json();
+    const results = (data.results || []).filter(x=>x.latitude != null && x.longitude != null && x.timezone);
+    if(!results.length){ setPlaceStatus('Luogo non trovato. Prova con città e nazione, es. “Roma, Italia”.', true); return null; }
+    if(silent){ selectBirthLocation(results[0]); return birthLocation; }
+    renderPlaceResults(results);
+    setPlaceStatus('Seleziona il luogo corretto tra i risultati.');
+    return results;
+  }catch(err){
+    setPlaceStatus('Impossibile cercare il luogo. Controlla la connessione o riprova più tardi.', true);
+    return null;
+  }
+}
+function zonedTimeToUtc(y, m, d, hh, mm, timeZone){
+  const dtf = new Intl.DateTimeFormat('en-GB', {timeZone, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'});
+  const parts = Object.fromEntries(dtf.formatToParts(new Date(Date.UTC(y, m-1, d, hh, mm))).filter(p=>p.type!=='literal').map(p=>[p.type, Number(p.value)]));
+  return new Date(Date.UTC(parts.year, parts.month-1, parts.day, parts.hour, parts.minute, parts.second));
+}
+
+// ============================================================
+// CALCOLO E RENDER (NON MODIFICARE)
+// ============================================================
+let currentResult = null;
+
+async function calculate(){
+  const name = document.getElementById('name').value.trim() || "Anonimo";
+  const birthdateStr = document.getElementById('birthdate').value;
+  const birthtimeStr = document.getElementById('birthtime').value;
+  const place = document.getElementById('place').value.trim();
+  if(!birthdateStr){ alert("Inserisci la data di nascita."); return; }
+  const [year, month, day] = birthdateStr.split('-').map(Number);
+  const [hour, minute] = birthtimeStr ? birthtimeStr.split(':').map(Number) : [12,0];
+  if(place && (!birthLocation || birthLocation.name !== place)) await geocodeBirthPlace(true);
+  let birth = new Date(birthdateStr + "T" + (birthtimeStr || "12:00"));
+  if(birthLocation && birthtimeStr){ birth = zonedTimeToUtc(year, month, day, hour, minute, birthLocation.timezone); }
+  const today = new Date();
+  if(birth > today){ alert("Data nel futuro!"); return; }
+
+  const weekdayIdx = new Date(Date.UTC(year, month-1, day)).getUTCDay();
+  let planetDetails = ephemerisPositions(birth);
+  let calculationSource = 'Fallback astronomico browser';
+  let swissData = null;
+  if(birthtimeStr && birthLocation){
+    swissData = await fetchSwissNatal({name, birthdateStr, birthtimeStr, place, location: birthLocation});
+    if(swissData?.natal?.planets){
+      birth = new Date(swissData.utc_datetime);
+      planetDetails = swissToPlanetDetails(swissData.natal.planets);
+      calculationSource = `Swiss Ephemeris ${swissData.engine_version || ''}`.trim();
+    }
+  }
+  let zodiac = ZMAP[planetDetails.Sole.sign] || getZodiac(month, day);
+  const chinese = getChinese(year);
+  const season = seasonFor(month, day);
+
+  let y = today.getFullYear() - year;
+  let m = today.getMonth() - birth.getMonth();
+  let d = today.getDate() - birth.getDate();
+  if(d < 0){ m--; d += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+  if(m < 0){ y--; m += 12; }
+  const daysLived = Math.floor((today - birth)/86400000);
+
+  let nextB = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+  if(nextB < today) nextB.setFullYear(nextB.getFullYear()+1);
+  const daysToNext = Math.ceil((nextB - today)/86400000);
+  const lifePath = lifePathNumber(birthdateStr);
+  let asc = {name:"—", emoji:"↑", degree:null, degreeText:"serve ora e luogo"};
+  if(planetDetails.Ascendente?.longitude != null){
+    asc = {name:planetDetails.Ascendente.sign, emoji:"↑", degree:planetDetails.Ascendente.longitude, degreeText:planetDetails.Ascendente.text, lat:birthLocation?.lat, lon:birthLocation?.lon, timezone:birthLocation?.timezone};
+  } else if(birthtimeStr && birthLocation){
+    const ascDeg = ascendantLongitude(birth, birthLocation.lat, birthLocation.lon);
+    const zd = zodiacFromDegree(ascDeg);
+    asc = {name:zd.sign, emoji:"↑", degree:ascDeg, degreeText:zd.text, lat:birthLocation.lat, lon:birthLocation.lon, timezone:birthLocation.timezone};
+  }
+  const moon = moonPhase(birth);
+  const freq = [0,0,0,0,0,0,0];
+  for(let yy=year; yy<= today.getFullYear(); yy++){ const dd = new Date(yy, birth.getMonth(), birth.getDate()); if(dd <= today) freq[dd.getDay()]++; }
+  if(!planetDetails.Ascendente) planetDetails.Ascendente = {body:'Ascendente', longitude:asc.degree, sign:asc.name, text:asc.degreeText || asc.name, retrograde:false};
+  const planets = Object.fromEntries(Object.entries(planetDetails).map(([k,v])=>[k, v.sign]));
+
+  // SIGNIFICATO DEL NOME (con chiave utente)
+  const firstName = name.split(' ')[0];
+  const nameMeaning = await fetchNameMeaning(firstName);
+
+  currentResult = {
+    name, birthdateStr, birthtimeStr, place, location: birthLocation,
+    birthISO: birth.toISOString(),
+    weekday: WEEKDAYS[weekdayIdx], weekdayIdx, weekdayEmoji: WEEK_EMOJI[weekdayIdx],
+    zodiac, chinese, season, moon,
+    ageY:y, ageM:m, ageD:d, age:y,
+    daysLived, daysToNext,
+    lifePath, asc,
+    freq, year, month, day,
+    nameMeaning,
+    planets, planetDetails, calculationSource, swissData
+  };
+  render();
+  document.getElementById('saveHint').textContent = "Profilo calcolato. Premi Salva per conservarlo.";
+}
+
+function render(){
+  if(!currentResult) return;
+  const r = currentResult;
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('resultWrap').classList.add('show');
+
+  document.getElementById('r_dateLong').textContent = new Date(Date.UTC(r.year, r.month-1, r.day)).toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'UTC'});
+  document.getElementById('r_name').textContent = r.name;
+  document.getElementById('r_subtitle').textContent = `${r.weekdayEmoji} Nato/a di ${r.weekday} • ${r.place ? r.place + " • " : ""}Età ${r.ageY}a ${r.ageM}m • ${r.daysLived.toLocaleString('it-IT')} giorni`;
+  document.getElementById('r_avatar').textContent = r.zodiac.emoji;
+
+  document.getElementById('r_weekday').textContent = `${r.weekdayEmoji} ${r.weekday}`;
+  document.getElementById('r_weekday_note').textContent = WEEK_NOTES[r.weekdayIdx];
+  document.getElementById('r_zodiac').textContent = `${r.zodiac.emoji} ${r.zodiac.name}`;
+  document.getElementById('r_zodiac_traits').textContent = `${r.zodiac.traits} • ${r.zodiac.el} / ${r.zodiac.mode}`;
+  document.getElementById('r_chinese').textContent = `${r.chinese.emoji} ${r.chinese.name}`;
+  document.getElementById('r_chinese_el').textContent = `Anno ${r.year} • Elemento ${r.chinese.element}`;
+  document.getElementById('r_asc').textContent = `☉ ${r.planetDetails?.Sole?.text || r.zodiac.name} • ☽ ${r.planetDetails?.Luna?.text || r.planets.Luna} • ↑ ${r.asc.degreeText || r.asc.name}`;
+
+  document.getElementById('s_age').textContent = `${r.ageY}a ${r.ageM}m ${r.ageD}g`;
+  document.getElementById('s_days').textContent = r.daysLived.toLocaleString('it-IT');
+  document.getElementById('s_next').textContent = r.daysToNext + " gg";
+  document.getElementById('s_season').textContent = r.season.emoji + " " + r.season.name;
+
+  const symbolsEl = document.getElementById('symbols'); symbolsEl.innerHTML = "";
+  [`Numero destino: ${r.lifePath}`,`Pianeta: ${r.zodiac.planet}`,`Pietra: ${r.zodiac.stone}`,`Colore: ${r.zodiac.color}`,`Fiore: ${r.zodiac.flower}`,`Metallo: ${r.zodiac.metal}`,`Elemento: ${r.zodiac.el}`,`Modalità: ${r.zodiac.mode}`,`Cinese: ${r.chinese.element}`,`Calcolo: ${r.calculationSource || 'Browser'}`].forEach(t=>{ const s=document.createElement('span'); s.className='pill'; s.textContent=t; symbolsEl.appendChild(s); });
+
+  const personalHoro = buildHoroscope(r);
+  document.getElementById('dailyHoroscope').textContent = personalHoro.text;
+  document.getElementById('dailyHoroscopeTech').innerHTML = personalHoro.tech;
+  document.getElementById('personalSummary').textContent = buildPersonalSummary(r);
+
+  const tl = document.getElementById('bdayTimeline'); tl.innerHTML = "";
+  WEEKDAYS.forEach((w,i)=>{ const div=document.createElement('div'); div.className='d'; div.innerHTML = `<strong>${r.freq[i]}</strong>${w.slice(0,3)}`; tl.appendChild(div); });
+  document.getElementById('lifeStats').textContent = `Hai vissuto ${Math.floor(r.daysLived/7).toLocaleString('it-IT')} settimane, ${(r.daysLived*24).toLocaleString('it-IT')} ore. 10.000° giorno: ${new Date(new Date(r.birthISO).getTime()+10000*86400000).toLocaleDateString('it-IT')}.`;
+
+  document.getElementById('moonPhase').textContent = `${r.moon.emoji} ${r.moon.name}`;
+  document.getElementById('moonPhaseDesc').textContent = r.moon.desc + ` • ${r.moon.pct}%`;
+  document.getElementById('r_planet').textContent = r.zodiac.planet;
+  document.getElementById('r_planet_desc').textContent = `Reggente di ${r.zodiac.name}`;
+  document.getElementById('eventDateLabel').textContent = `${r.day}/${r.month}`;
+  const evEl = document.getElementById('eventList'); evEl.innerHTML=''; getEventsFor(r.day, r.month).forEach(ev=>{ const li=document.createElement('li'); li.textContent=ev; evEl.appendChild(li); });
+  document.getElementById('nameMeaning').textContent = r.nameMeaning ? `${r.name.split(' ')[0]}: ${r.nameMeaning}` : `Significato di "${r.name.split(' ')[0]}" non ancora disponibile.`;
+
+  drawNatalWheel(r.planetDetails || r.planets);
+  renderNatalTable(r.planetDetails || r.planets);
+  renderTransits(r);
+  renderCompatRanking();
+  renderBirthdayCalendar();
+}
+
+function buildHoroscope(r){
+  const now = new Date();
+  const moonNow = moonPhase(now);
+  if(r.swissData?.current_sky?.planets){
+    const sky = r.swissData.current_sky.planets;
+    const primary = r.swissData.transits?.[0];
+    const base = `${r.name}, oggi il Sole transita a ${sky.Sole.text} e la Luna a ${sky.Luna.text}.`;
+    const transitText = primary ? ` Transito principale da Swiss Ephemeris: ${primary.transit} in ${primary.aspect} a ${primary.natal} natale, orb ${Number(primary.orb).toFixed(1)}°.` : ' Non emergono aspetti maggiori stretti sui punti natali principali.';
+    const moonTone = moonNow.name.includes('Piena') ? 'La fase lunare piena amplifica consapevolezza, relazioni e bisogno di chiarezza.' :
+      moonNow.name.includes('Nuova') ? 'La fase di Luna Nuova favorisce impostazione, semina e ripartenze.' :
+      moonNow.name.includes('Crescente') || moonNow.name.includes('Quarto') ? 'La Luna crescente sostiene costruzione, decisioni progressive e sviluppo.' :
+      'La Luna calante favorisce revisione, chiusura di dettagli e recupero di energia.';
+    return {
+      text: `${base}${transitText} ${moonTone}`,
+      tech: `<strong>Motore:</strong> Swiss Ephemeris backend (${r.swissData.engine_version || 'versione non indicata'}).<br><strong>Transiti rilevati:</strong> ${(r.swissData.transits||[]).slice(0,5).map(swissTransitText).join(' · ') || 'nessun aspetto maggiore stretto'}.`
+    };
+  }
+  const transits = ephemerisPositions(now);
+  const major = findMajorTransits(r, now);
+  const primary = major[0];
+  const sunNow = transits.Sole;
+  const moonSign = transits.Luna;
+  const base = `${r.name}, oggi il Sole transita a ${sunNow.text} e la Luna a ${moonSign.text}.`;
+  const transitText = primary ? ` Transito principale rilevato: ${primary.transit} in ${primary.aspect} a ${primary.natal} natale, orb ${primary.orb.toFixed(1)}°.` : ` Non emergono aspetti maggiori stretti tra i pianeti rapidi e i punti natali principali: giornata da leggere soprattutto attraverso Sole e Luna.`;
+  const moonTone = moonNow.name.includes('Piena') ? 'La fase lunare piena amplifica consapevolezza, relazioni e bisogno di chiarezza.' :
+    moonNow.name.includes('Nuova') ? 'La fase di Luna Nuova favorisce impostazione, semina e ripartenze.' :
+    moonNow.name.includes('Crescente') || moonNow.name.includes('Quarto') ? 'La Luna crescente sostiene costruzione, decisioni progressive e sviluppo.' :
+    'La Luna calante favorisce revisione, chiusura di dettagli e recupero di energia.';
+  const list = major.length ? major.map(x=>`${x.transit} ${x.aspect} ${x.natal} (${x.orb.toFixed(1)}°)`).join(' · ') : 'nessun aspetto maggiore stretto';
+  return {
+    text: `${base}${transitText} ${moonTone}`,
+    tech: `<strong>Dati usati:</strong> tema natale calcolato in gradi e cielo attuale calcolato in gradi. Aspetti considerati: congiunzione, sestile, quadratura, trigono, opposizione.<br><strong>Transiti rilevati:</strong> ${list}.<br><strong>Nota tecnica:</strong> fallback astronomico lato browser; avvia il backend Swiss Ephemeris per la massima precisione.`
+  };
+}
+function getEventsFor(day, month){ const key = `${day}-${month}`; if(EVENTS_DB[key]) return EVENTS_DB[key].split(" • "); return ["Un giorno perfetto per iniziare qualcosa di nuovo.", `Segno del giorno: ${getZodiac(month, day).name}`]; }
+
+// ============================================================
+// NATAL CHART
+// ============================================================
+function drawNatalWheel(planets){
+  const svg = document.getElementById('natalWheel');
+  svg.innerHTML = '';
+  const cx=130, cy=130, R=115;
+  const ns = "http://www.w3.org/2000/svg";
+  const circ = document.createElementNS(ns,'circle'); circ.setAttribute('cx',cx); circ.setAttribute('cy',cy); circ.setAttribute('r',R); circ.setAttribute('fill','none'); circ.setAttribute('stroke','#ffffff22'); svg.appendChild(circ);
+  for(let i=0;i<12;i++){
+    const a = (i*30 - 90) * Math.PI/180;
+    const line = document.createElementNS(ns,'line');
+    line.setAttribute('x1', cx + Math.cos(a)*(R-34)); line.setAttribute('y1', cy + Math.sin(a)*(R-34));
+    line.setAttribute('x2', cx + Math.cos(a)*R); line.setAttribute('y2', cy + Math.sin(a)*R);
+    line.setAttribute('stroke', 'rgba(255,255,255,.12)'); svg.appendChild(line);
+  }
+  ORDER.forEach((sign,i)=>{
+    const angle = (i * 30 + 15 - 90) * Math.PI/180;
+    const x1 = cx + Math.cos(angle)* (R-18);
+    const y1 = cy + Math.sin(angle)* (R-18);
+    const tx = document.createElementNS(ns,'text');
+    tx.setAttribute('x', x1); tx.setAttribute('y', y1+4);
+    tx.setAttribute('text-anchor','middle'); tx.setAttribute('font-size','13'); tx.setAttribute('fill','#b9b0d6');
+    tx.textContent = ZMAP[sign].emoji;
+    svg.appendChild(tx);
+  });
+  Object.entries(planets).forEach(([p, detail], idx)=>{
+    const lon = typeof detail === 'string' ? (ORDER.indexOf(detail) * 30 + 15) : detail?.longitude;
+    if(lon == null || isNaN(lon)) return;
+    const angle = (normalizeDeg(lon) - 90) * Math.PI/180;
+    const radp = 72 - (idx%6)*7;
+    const x = cx + Math.cos(angle)*radp;
+    const y = cy + Math.sin(angle)*radp;
+    const t = document.createElementNS(ns,'text');
+    t.setAttribute('x',x); t.setAttribute('y',y+4);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','15'); t.setAttribute('fill','#f2efff'); t.setAttribute('font-weight','700');
+    t.textContent = PLANET_ICONS[p] || '•';
+    const title = document.createElementNS(ns,'title'); title.textContent = `${p}: ${typeof detail === 'string' ? detail : detail?.text || detail?.sign || '—'}`; t.appendChild(title);
+    svg.appendChild(t);
+  });
+}
+function renderNatalTable(planets){
+  const el = document.getElementById('natalTable');
+  const order = [...PLANET_LABELS, 'Ascendente', 'Medio Cielo'];
+  el.innerHTML = order.filter(k=>planets[k]).map(k=>{
+    const d = planets[k];
+    const sign = typeof d === 'string' ? d : d?.sign;
+    const text = typeof d === 'string' ? d : (d?.text || d?.sign || '—');
+    const retro = (typeof d === 'object' && d.retrograde) ? ' ℞' : '';
+    return `<tr><td>${PLANET_ICONS[k]||''} ${k}</td><td><strong>${ZMAP[sign]?.emoji||''} ${text}${retro}</strong></td></tr>`;
+  }).join('');
+}
+function renderTransits(r){
+  if(r?.swissData?.current_sky?.planets){
+    const trans = r.swissData.current_sky.planets;
+    const sky = ['Sole','Luna','Mercurio','Venere','Marte','Giove','Saturno'].filter(k=>trans[k]).map(k=>`${PLANET_ICONS[k]} ${k}: ${trans[k].text}${trans[k].retrograde?' ℞':''}`).join(' · ');
+    const tr = (r.swissData.transits || []).length ? r.swissData.transits.slice(0,6).map(swissTransitText).join(' · ') : 'nessun aspetto maggiore stretto rilevato sui punti principali';
+    document.getElementById('transitsToday').textContent = `${sky}. Transiti personali Swiss Ephemeris: ${tr}.`;
+    return;
+  }
+  const today = new Date();
+  const trans = ephemerisPositions(today);
+  const major = r ? findMajorTransits(r, today) : [];
+  const sky = ['Sole','Luna','Mercurio','Venere','Marte'].map(k=>`${PLANET_ICONS[k]} ${k}: ${trans[k].text}${trans[k].retrograde?' ℞':''}`).join(' · ');
+  const tr = major.length ? major.map(x=>`${x.transit} ${x.aspect} ${x.natal} (${x.orb.toFixed(1)}°)`).join(' · ') : 'nessun aspetto maggiore stretto rilevato sui punti principali';
+  document.getElementById('transitsToday').textContent = `${sky}. Transiti personali: ${tr}.`;
+}
+
+// ============================================================
+// PROFILI SALVATI (LOCALSTORAGE)
+// ============================================================
+const LS_KEY = "chronobirth_profiles_v4";
+function loadProfiles(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch(e){ return [];} }
+function saveProfiles(list){ localStorage.setItem(LS_KEY, JSON.stringify(list)); renderProfiles(); }
+function renderProfiles(){
+  const list = loadProfiles();
+  const el = document.getElementById('profilesList');
+  const ca = document.getElementById('compatA'); const cb = document.getElementById('compatB');
+  el.innerHTML = ''; ca.innerHTML = ''; cb.innerHTML = '';
+  const validProfiles = list.filter(p => p.calc && p.calc.zodiac && p.calc.zodiac.name);
+  document.getElementById('profileCount').textContent = validProfiles.length;
+  validProfiles.forEach((p, idx) => {
+    const div = document.createElement('div'); div.className = 'profile-chip';
+    div.innerHTML = `<div><strong>${p.name}</strong><br><small>${p.birthdateStr} · ${p.calc.zodiac.name}</small></div><div class="actions"><button class="edit" data-idx="${idx}">✎</button><button class="del" data-idx="${idx}">×</button></div>`;
+    div.addEventListener('click', (e) => { if(e.target.closest('.actions')) return; loadProfileIntoForm(p); });
+    div.querySelector('.del').addEventListener('click', (e) => { e.stopPropagation(); const idx2 = parseInt(e.target.dataset.idx); const arr = loadProfiles(); const realIdx = arr.findIndex(x => x.calc && x.calc.zodiac && x.calc.zodiac.name && x.name === p.name && x.birthdateStr === p.birthdateStr); if(realIdx !== -1){ arr.splice(realIdx, 1); saveProfiles(arr); } });
+    div.querySelector('.edit').addEventListener('click', (e) => { e.stopPropagation(); const idx2 = parseInt(e.target.dataset.idx); const arr = loadProfiles(); const realIdx = arr.findIndex(x => x.calc && x.calc.zodiac && x.calc.zodiac.name && x.name === p.name && x.birthdateStr === p.birthdateStr); if(realIdx === -1) return; loadProfileIntoForm(p); arr.splice(realIdx, 1); saveProfiles(arr); document.getElementById('saveHint').textContent = "Modifica in corso: ricalcola e salva per aggiornare."; });
+    el.appendChild(div);
+    const optA = document.createElement('option'); optA.value = idx; optA.textContent = `${p.name} (${p.calc.zodiac.name})`;
+    ca.appendChild(optA);
+    const optB = document.createElement('option'); optB.value = idx; optB.textContent = optA.textContent;
+    cb.appendChild(optB);
+  });
+  if(validProfiles.length >= 2){ ca.selectedIndex = 0; cb.selectedIndex = 1; }
+  renderBirthdayCalendar();
+  renderCompatRanking();
+}
+function loadProfileIntoForm(p){
+  document.getElementById('name').value = p.name || "";
+  document.getElementById('birthdate').value = p.birthdateStr || "";
+  document.getElementById('birthtime').value = p.birthtimeStr || "";
+  document.getElementById('place').value = p.place || "";
+  birthLocation = p.calc?.location || null;
+  if(birthLocation){
+    const det = document.getElementById('locationDetails');
+    det.style.display = 'block';
+    det.innerHTML = `<strong>Luogo selezionato:</strong> ${birthLocation.name}<br>Coordinate: ${birthLocation.lat.toFixed(4)}, ${birthLocation.lon.toFixed(4)} · Fuso: ${birthLocation.timezone}`;
+  }
+  currentResult = p.calc || null;
+  if(currentResult) render(); else calculate();
+}
+document.getElementById('btnSaveProfile').onclick = () => {
+  if(!currentResult || !currentResult.zodiac){ alert("Calcola prima il profilo completo."); return; }
+  const profiles = loadProfiles();
+  const exists = profiles.some(p => p.name === currentResult.name && p.birthdateStr === currentResult.birthdateStr);
+  if(exists && !confirm("Esiste già un profilo con questo nome e data. Vuoi sovrascriverlo?")) return;
+  const filtered = profiles.filter(p => !(p.name === currentResult.name && p.birthdateStr === currentResult.birthdateStr));
+  filtered.push({ name: currentResult.name, birthdateStr: currentResult.birthdateStr, birthtimeStr: currentResult.birthtimeStr, place: currentResult.place, calc: currentResult, savedAt: new Date().toISOString() });
+  saveProfiles(filtered);
+  document.getElementById('saveHint').textContent = "✓ Profilo salvato.";
+};
+
+// ============================================================
+// COMPATIBILITÀ
+// ============================================================
+function drawRadar(cd){
+  const w=260,h=220,cx=130,cy=110,r=88;
+  const vals=[cd.love,cd.friendship,cd.work,cd.trust];
+  const labels=["Amore","Amicizia","Lavoro","Fiducia"];
+  let points = vals.map((v,i)=>{ const a = (i/4 * 2*Math.PI - Math.PI/2); const rr = r * v/100; return `${cx + Math.cos(a)*rr},${cy + Math.sin(a)*rr}`; }).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" width="260" height="220" style="background:#120d25;border:1px solid var(--border);border-radius:12px">
+    <polygon points="${points}" fill="rgba(139,92,246,0.35)" stroke="#a78bfa" stroke-width="2"/>
+    ${labels.map((lb,i)=>{ const a = (i/4 * 2*Math.PI - Math.PI/2); const x=cx+Math.cos(a)*(r+18); const y=cy+Math.sin(a)*(r+12); return `<text x="${x}" y="${y}" text-anchor="middle" fill="#b8add8" font-size="11">${lb}</text>`}).join('')}
+  </svg>`;
+}
+document.getElementById('btnCompat').onclick = () => {
+  const profiles = loadProfiles();
+  const validProfiles = profiles.filter(p => p.calc && p.calc.zodiac && p.calc.zodiac.name);
+  const aIdx = parseInt(document.getElementById('compatA').value);
+  const bIdx = parseInt(document.getElementById('compatB').value);
+  if (isNaN(aIdx) || isNaN(bIdx) || aIdx < 0 || bIdx < 0 || aIdx >= validProfiles.length || bIdx >= validProfiles.length) { alert("Seleziona due profili validi dalla lista (ne servono almeno due salvati)."); return; }
+  const A = validProfiles[aIdx].calc; const B = validProfiles[bIdx].calc;
+  if (!A || !B) { alert("Uno dei profili selezionati non ha dati astrologici. Ricalcola il profilo e riprova."); return; }
+  const cd = compatDetail(A.zodiac.name, B.zodiac.name);
+  const chineseScore = chineseCompat(A.chinese.name, B.chinese.name);
+  const numScore = Math.max(30, 95 - Math.abs(A.lifePath - B.lifePath) * 12);
+  const total = Math.round((cd.love * 0.55 + chineseScore * 0.2 + numScore * 0.25));
+  const html = `<div class="compat-box"><strong>${A.name} ${A.zodiac.emoji} × ${B.name} ${B.zodiac.emoji}</strong><div class="compat-bar"><div class="compat-fill" style="width:${cd.love}%"></div></div><div class="compat-grid"><div class="cstat"><strong>${cd.love}%</strong>Amore</div><div class="cstat"><strong>${cd.friendship}%</strong>Amicizia</div><div class="cstat"><strong>${cd.work}%</strong>Lavoro</div><div class="cstat"><strong>${cd.trust}%</strong>Fiducia</div></div><p class="small" style="margin-top:8px">${cd.elA} + ${cd.elB} – ${cd.elementMatch}.<br><strong>Punti forti:</strong> ${cd.love >= 75 ? "attrazione immediata e buona risonanza" : cd.friendship >= 70 ? "dialogo e complicità mentale" : "possibilità di crescita se c'è ascolto"}.<br><strong>Sfida:</strong> ${cd.trust < 60 ? "costruire fiducia con chiarezza" : "non dare per scontata la sintonia"}.<br>Modalità: ${cd.modeA} / ${cd.modeB}.<br>Cinese: ${A.chinese.name} (${A.chinese.element}) × ${B.chinese.name} (${B.chinese.element}) = ${chineseScore}%<br>Numerologia ${A.lifePath}/${B.lifePath} = ${numScore}%<br><strong>Score totale: ${total}%</strong></p></div>`;
+  document.getElementById('compatOut').innerHTML = html;
+  document.getElementById('compatFullOut').innerHTML = html;
+  document.getElementById('compatRadarWrap').innerHTML = drawRadar(cd);
+  document.querySelector('[data-tab="compat"]').click();
+};
+function renderCompatRanking(){
+  const el = document.getElementById('compatRanking');
+  if(!el) return;
+  if(!currentResult){ el.innerHTML = '<span class="small">Calcola un profilo per vedere la classifica.</span>'; return; }
+  const profiles = loadProfiles().filter(p=>p.calc && p.calc.birthdateStr !== currentResult.birthdateStr);
+  if(profiles.length===0){ el.innerHTML = '<span class="small">Salva altri profili per confrontarli.</span>'; return; }
+  const ranked = profiles.map(p=>{ const cd = compatDetail(currentResult.zodiac.name, p.calc.zodiac.name); return {name:p.name, sign:p.calc.zodiac.emoji+' '+p.calc.zodiac.name, score:cd.love}; }).sort((a,b)=>b.score-a.score);
+  el.innerHTML = ranked.map(r=> `<div class="rank-item"><span><strong>${r.name}</strong> · ${r.sign}</span><span><strong>${r.score}%</strong></span></div>`).join('');
+}
+(function buildMatrix(){
+  const table = document.getElementById('compatMatrix');
+  let head = "<tr><th></th>"+ORDER.map(s=>`<th>${ZMAP[s].emoji}<br>${s.slice(0,3)}</th>`).join("")+"</tr>";
+  let rows = ORDER.map(a=> "<tr><th>"+ZMAP[a].emoji+" "+a+"</th>"+ ORDER.map(b=>{ const v = COMPAT_MATRIX[a][b]; const cls = v>=75 ? "good" : v>=55 ? "mid" : "bad"; return `<td class="${cls}">${v}%</td>`; }).join("")+"</tr>").join("");
+  table.innerHTML = head + rows;
+})();
+
+// ============================================================
+// CALENDARIO COMPLEANNI
+// ============================================================
+function renderBirthdayCalendar(){
+  const calEl = document.getElementById('birthdayCalendar');
+  const profiles = loadProfiles().filter(p=>p.calc);
+  if(profiles.length===0){ calEl.textContent = "Nessun profilo salvato."; return; }
+  const today = new Date();
+  const list = profiles.map(p=>{ const b = new Date(p.calc.birthISO); let next = new Date(today.getFullYear(), b.getMonth(), b.getDate()); if(next < today) next.setFullYear(next.getFullYear()+1); const days = Math.ceil((next-today)/86400000); return {name:p.name, date: next.toLocaleDateString('it-IT', {day:'numeric', month:'short'}), days}; }).sort((a,b)=>a.days-b.days);
+  calEl.innerHTML = list.map(x=> `• <strong>${x.name}</strong> – ${x.date} (${x.days} gg)`).join('<br>');
+}
+document.getElementById('btnNotify').onclick = async ()=>{
+  if(!("Notification" in window)){ alert("Notifiche non supportate"); return;}
+  const perm = await Notification.requestPermission();
+  if(perm !== "granted"){ alert("Permesso negato"); return;}
+  new Notification("ChronoBirth 🔔", {body:"Promemoria compleanni attivati! Ti avviseremo.", icon:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'></svg>"});
+  localStorage.setItem('cb_notify','1');
+  alert("Promemoria attivati. Controlleremo i compleanni a ogni apertura.");
+};
+
+// ============================================================
+// CONDIVISIONE
+// ============================================================
+document.getElementById('btnCopy').onclick = ()=>{
+  if(!currentResult) return;
+  const r = currentResult;
+  const txt = `${r.name} • ${r.weekday} ${r.day}/${r.month}/${r.year}\nSegno: ${r.zodiac.name} ${r.zodiac.emoji} • Cinese: ${r.chinese.name} ${r.chinese.element}\nLuna: ${r.moon.name} • Età ${r.ageY} • Destino ${r.lifePath}\nChronoBirth`;
+  navigator.clipboard.writeText(txt).then(()=> alert("Riepilogo copiato!"));
+};
+document.getElementById('btnShare').onclick = async ()=>{
+  if(!currentResult) return;
+  const url = location.href.split('?')[0] + `?date=${currentResult.birthdateStr}&name=${encodeURIComponent(currentResult.name)}`;
+  if(navigator.share){ try{ await navigator.share({title:"Il mio profilo ChronoBirth", text:`${currentResult.name} - ${currentResult.zodiac.name}`, url}); return;}catch(e){} }
+  navigator.clipboard.writeText(url); alert("Link copiato!");
+};
+document.getElementById('btnWhats').onclick = ()=>{
+  if(!currentResult) return;
+  const r=currentResult;
+  const txt = encodeURIComponent(`Il mio profilo ChronoBirth: ${r.name} - ${r.zodiac.emoji} ${r.zodiac.name}, Cinese ${r.chinese.emoji} ${r.chinese.name} ${r.chinese.element}, Luna ${r.moon.emoji}. ` + location.href.split('?')[0] + `?date=${r.birthdateStr}&name=${encodeURIComponent(r.name)}`);
+  window.open(`https://wa.me/?text=${txt}`, '_blank');
+};
+document.getElementById('btnCard').onclick = ()=>{
+  if(!currentResult) return;
+  const r = currentResult;
+  const c = document.createElement('canvas'); c.width=1080; c.height=1350;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0,0,0,1350); g.addColorStop(0, "#28164f"); g.addColorStop(1, "#14102a");
+  x.fillStyle = g; x.fillRect(0,0,1080,1350);
+  x.fillStyle="#fff"; x.font="700 64px system-ui"; x.fillText(r.name, 80, 190);
+  x.font="500 34px system-ui"; x.fillStyle="#bfafff";
+  x.fillText(new Date(r.birthISO).toLocaleDateString('it-IT', {dateStyle:'full'}), 80, 245);
+  x.fillStyle="#fff"; x.font="700 50px system-ui";
+  x.fillText(`${r.zodiac.emoji} ${r.zodiac.name}  •  ${r.chinese.emoji} ${r.chinese.name}`, 80, 360);
+  x.font="400 34px system-ui"; x.fillStyle="#c8c2e0";
+  [
+    `Giorno: ${r.weekday} • Luna natale: ${r.planetDetails?.Luna?.text || r.moon.name}`,
+    `Età: ${r.ageY}a ${r.ageM}m • ${r.daysLived.toLocaleString('it-IT')} giorni`,
+    `Elemento: ${r.zodiac.el} • Destino: ${r.lifePath}`,
+    `Pianeta: ${r.zodiac.planet} • Cinese: ${r.chinese.element}`,
+    `Pietra: ${r.zodiac.stone} • Colore: ${r.zodiac.color}`,
+  ].forEach((t,i)=> x.fillText(t, 80, 440 + i*48));
+  x.fillStyle = "#7b6aaa"; x.font="500 26px system-ui";
+  x.fillText("ChronoBirth  •  profilo astrologico", 80, 1280);
+  const a = document.createElement('a'); a.download = `chronobirth-${r.name.toLowerCase().replace(/\s+/g,'-')}.png`; a.href = c.toDataURL('image/png'); a.click();
+};
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+document.getElementById('btnExport').onclick = ()=>{
+  const data = JSON.stringify(loadProfiles(), null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "chronobirth-profiles.json"; a.click();
+};
+document.getElementById('btnImport').onclick = ()=> document.getElementById('fileImport').click();
+document.getElementById('fileImport').onchange = e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=> { try { const j = JSON.parse(reader.result); saveProfiles(j); alert("Importati " + j.length + " profili."); } catch(err){ alert("File non valido");}};
+  reader.readAsText(f);
+};
+document.getElementById('btnClearAll').onclick = ()=>{ if(confirm("Eliminare tutti i profili?")){ localStorage.removeItem(LS_KEY); renderProfiles(); }};
+document.getElementById('btnPrint').onclick = ()=> window.print();
+
+// ============================================================
+// BOTTONI E EVENTI
+// ============================================================
+document.getElementById('btnCalc').onclick = calculate;
+document.getElementById('btnSearchPlace').onclick = ()=> geocodeBirthPlace(false);
+document.getElementById('place').addEventListener('input', ()=>{
+  birthLocation = null;
+  document.getElementById('locationDetails').style.display = 'none';
+  document.getElementById('placeResults').style.display = 'none';
+  setPlaceStatus('Scrivi la città di nascita e premi Cerca. Non usare la posizione attuale se sei nato altrove.');
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  };
+});
+
+document.querySelectorAll('.bottom-nav button').forEach(b=> b.onclick = ()=>{
+  document.querySelectorAll('.bottom-nav button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  const target = document.getElementById(b.dataset.jump);
+  if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+// ============================================================
+// GESTIONE CHIAVE NAMEAPI (LOCALSTORAGE)
+// ============================================================
+const API_KEY_STORAGE = 'chronobirth_name_api_key';
+function loadApiKey() {
+  const key = localStorage.getItem(API_KEY_STORAGE);
+  if (key) {
+    document.getElementById('nameApiKey').value = key;
+    document.getElementById('apiKeyStatus').textContent = '✅ Chiave configurata.';
+  }
+}
+document.getElementById('btnSaveApiKey').addEventListener('click', () => {
+  const key = document.getElementById('nameApiKey').value.trim();
+  if (key) {
+    localStorage.setItem(API_KEY_STORAGE, key);
+    document.getElementById('apiKeyStatus').textContent = '✅ Chiave salvata.';
+  } else {
+    localStorage.removeItem(API_KEY_STORAGE);
+    document.getElementById('apiKeyStatus').textContent = '❌ Chiave rimossa.';
+  }
+});
+function getUserApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE);
+}
+
+// ============================================================
+// SIGNIFICATO DEL NOME + TRADUZIONE OPEN SOURCE (GitHub-ready)
+// ============================================================
+const NAME_CACHE_KEY = 'chronobirth_name_meanings';
+const TRANSLATE_URL_KEY = 'chronobirth_libretranslate_url';
+const TRANSLATE_ON_KEY = 'chronobirth_translate_enabled';
+// Istanze pubbliche da provare (ordine). Su GitHub Pages non c'è backend:
+// la traduzione parte dal browser.
+const LIBRETRANSLATE_DEFAULTS = [
+  'https://libretranslate.com',
+  'https://translate.argosopentech.com',
+  'https://trans.zillyhuhn.com'
+];
+
+function getCachedNameMeaning(name) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(NAME_CACHE_KEY) || '{}');
+    return cache[name.toLowerCase()] || null;
+  } catch { return null; }
+}
+function saveNameMeaningToCache(name, meaning) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(NAME_CACHE_KEY) || '{}');
+    cache[name.toLowerCase()] = meaning;
+    localStorage.setItem(NAME_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
+
+function isTranslateEnabled() {
+  const v = localStorage.getItem(TRANSLATE_ON_KEY);
+  if (v === null) return true; // default ON
+  return v === '1' || v === 'true';
+}
+function getLibreTranslateUrl() {
+  return (localStorage.getItem(TRANSLATE_URL_KEY) || '').trim().replace(/\/$/, '');
+}
+function looksItalian(text) {
+  if (!text) return false;
+  const t = text.toLowerCase();
+  // accenti IT o parole tipiche
+  if (/[àèéìòù]/.test(t)) return true;
+  const itHints = ['di ', 'del ', 'della ', 'che ', 'per ', 'con ', 'una ', 'uno ', 'il ', 'la ', 'gli ', 'portatore', 'dono', 'grazia', 'luminosa', 'guerriero', 'principessa'];
+  let hits = 0;
+  for (const h of itHints) if (t.includes(h)) hits++;
+  return hits >= 2;
+}
+function looksEnglish(text) {
+  if (!text) return false;
+  if (looksItalian(text)) return false;
+  const t = text.toLowerCase();
+  const enHints = [' the ', ' of ', ' and ', ' from ', ' with ', 'beloved', 'gift', 'god', 'light', 'warrior', 'grace', 'noble', 'derived', 'meaning', 'hebrew', 'latin', 'greek'];
+  const padded = ` ${t} `;
+  let hits = 0;
+  for (const h of enHints) if (padded.includes(h)) hits++;
+  // se ha molte lettere latine e poche strutture IT
+  if (hits >= 1) return true;
+  // default: se non sembra IT e ha parole inglesi comuni
+  return /\b(the|and|of|from|gift|beloved|light|warrior|grace|noble)\b/i.test(text);
+}
+
+/** LibreTranslate open source */
+async function translateWithLibre(text, baseUrl) {
+  const url = `${baseUrl.replace(/\/$/, '')}/translate`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ q: text, source: 'en', target: 'it', format: 'text' })
+  });
+  if (!res.ok) throw new Error('LibreTranslate HTTP ' + res.status);
+  const data = await res.json();
+  const out = data.translatedText || data.translation || data.translated_text;
+  if (!out || typeof out !== 'string') throw new Error('Risposta LT vuota');
+  return out.trim();
+}
+
+/** MyMemory free API — funziona bene da GitHub Pages (browser) */
+async function translateWithMyMemory(text) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|it`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('MyMemory HTTP ' + res.status);
+  const data = await res.json();
+  const out = data?.responseData?.translatedText;
+  if (!out || typeof out !== 'string') throw new Error('Risposta MyMemory vuota');
+  // MyMemory a volte restituisce "QUERY LENGTH LIMIT" ecc.
+  if (/QUERY LENGTH|INVALID|ERROR/i.test(out)) throw new Error(out);
+  return out.trim();
+}
+
+/**
+ * Traduce EN→IT con LibreTranslate (open source) e fallback MyMemory.
+ * Su GitHub Pages non serve Python.
+ */
+async function translateToItalian(text) {
+  if (!text || !isTranslateEnabled()) return text;
+  if (!looksEnglish(text)) return text; // già IT o non EN
+
+  const custom = getLibreTranslateUrl();
+  const candidates = custom ? [custom, ...LIBRETRANSLATE_DEFAULTS] : [...LIBRETRANSLATE_DEFAULTS];
+  // unica lista
+  const seen = new Set();
+  for (const base of candidates) {
+    if (!base || seen.has(base)) continue;
+    seen.add(base);
+    try {
+      const out = await translateWithLibre(text, base);
+      if (out && out.toLowerCase() !== text.toLowerCase()) {
+        console.log('[translate] LibreTranslate OK via', base);
+        return out;
+      }
+    } catch (e) {
+      console.warn('[translate] LibreTranslate fail', base, e.message || e);
+    }
+  }
+  try {
+    const out = await translateWithMyMemory(text);
+    console.log('[translate] MyMemory OK');
+    return out;
+  } catch (e) {
+    console.warn('[translate] MyMemory fail', e.message || e);
+  }
+  return text; // lascia inglese se tutto fallisce
+}
+
+function setTranslateStatus(msg, color) {
+  const el = document.getElementById('translateStatus');
+  if (!el) return;
+  el.textContent = msg;
+  if (color) el.style.color = color;
+}
+function initTranslateUi() {
+  const chk = document.getElementById('translateEnabled');
+  const input = document.getElementById('libreTranslateUrl');
+  const saveBtn = document.getElementById('btnSaveTranslate');
+  const testBtn = document.getElementById('btnTestTranslate');
+  if (chk) {
+    chk.checked = isTranslateEnabled();
+    chk.onchange = () => {
+      localStorage.setItem(TRANSLATE_ON_KEY, chk.checked ? '1' : '0');
+      setTranslateStatus(chk.checked ? 'Traduzione automatica attiva.' : 'Traduzione disattivata.', 'var(--muted)');
+    };
+  }
+  if (input) input.value = getLibreTranslateUrl();
+  if (saveBtn) {
+    saveBtn.onclick = () => {
+      const v = (input?.value || '').trim().replace(/\/$/, '');
+      if (v) localStorage.setItem(TRANSLATE_URL_KEY, v);
+      else localStorage.removeItem(TRANSLATE_URL_KEY);
+      setTranslateStatus(v ? `URL salvato: ${v}` : 'URL personalizzato rimosso (uso automatico).', 'var(--green)');
+    };
+  }
+  if (testBtn) {
+    testBtn.onclick = async () => {
+      setTranslateStatus('Prova traduzione: “Beloved gift of God”…', 'var(--muted)');
+      try {
+        const out = await translateToItalian('Beloved gift of God');
+        setTranslateStatus(`✅ Prova OK → “${out}”`, 'var(--green)');
+      } catch (e) {
+        setTranslateStatus('❌ Traduzione non disponibile ora. Il dizionario locale resta attivo.', 'var(--red)');
+      }
+    };
+  }
+  setTranslateStatus(
+    isTranslateEnabled()
+      ? 'Traduzione attiva (LibreTranslate open source + fallback MyMemory). Ok anche su GitHub Pages.'
+      : 'Traduzione disattivata.',
+    'var(--muted)'
+  );
+}
+
+async function fetchNameMeaning(name) {
+  const key = name.toLowerCase().trim();
+  if (!key) return null;
+
+  // 1. Cache
+  const cached = getCachedNameMeaning(key);
+  if (cached) return cached;
+
+  // 2. Dizionario locale (già italiano)
+  if (NAME_MEANINGS[key]) {
+    const meaning = NAME_MEANINGS[key];
+    saveNameMeaningToCache(key, meaning);
+    return meaning;
+  }
+
+  let meaning = null;
+  let source = null;
+
+  // 3. Backend proxy (locale con avvia.bat): NameAPI + traduzione server-side
+  const backendUrl = backendBaseUrl();
+  const userApiKey = getUserApiKey();
+  if (backendUrl) {
+    try {
+      const qs = new URLSearchParams({ name });
+      if (userApiKey) qs.set('apiKey', userApiKey);
+      qs.set('translate', isTranslateEnabled() ? '1' : '0');
+      const res = await fetch(`${backendUrl}/api/name-meaning?${qs.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.meaning) {
+          meaning = data.meaning;
+          source = data.source || 'backend';
+        }
+      }
+    } catch (e) {
+      console.warn('Backend name-meaning non disponibile:', e);
+    }
+  }
+
+  // 4. Se ancora niente e abbiamo testo grezzo da tradurre: nient'altro da NameAPI
+  //    lato browser (CORS). Su GitHub Pages restano dizionario + eventuale cache.
+
+  // 5. Traduzione client-side se il testo sembra inglese (GitHub Pages friendly)
+  if (meaning) {
+    const translated = await translateToItalian(meaning);
+    if (translated) meaning = translated;
+    saveNameMeaningToCache(key, meaning);
+    return meaning;
+  }
+
+  return null;
+}
+
+// ============================================================
+// PWA – SERVICE WORKER E INSTALLAZIONE
+// ============================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('btnInstall');
+  if (btn) btn.style.display = 'inline-block';
+});
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const btn = document.getElementById('btnInstall');
+  if (btn) btn.style.display = 'none';
+  console.log('✅ ChronoBirth installata come PWA');
+});
+document.getElementById('btnInstall').onclick = async () => {
+  if (!deferredPrompt) {
+    // iOS Safari non supporta beforeinstallprompt: guida manuale
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS) {
+      alert('Su iPhone/iPad: tocca Condividi (□↑) e poi “Aggiungi a Home”.');
+    } else {
+      alert('Per installare usa il menu del browser → “Installa app” / “Installa ChronoBirth”.');
+    }
+    return;
+  }
+  deferredPrompt.prompt();
+  try { await deferredPrompt.userChoice; } catch (_) {}
+  deferredPrompt = null;
+  document.getElementById('btnInstall').style.display = 'none';
+};
+// Su iOS mostra comunque il bottone install (guida manuale)
+(function showIosInstallHint() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (isIOS && !isStandalone) {
+    const btn = document.getElementById('btnInstall');
+    if (btn) btn.style.display = 'inline-block';
+  }
+})();
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((reg) => {
+        console.log('✅ Service Worker registrato', reg.scope);
+        // Controlla aggiornamenti periodici
+        setInterval(() => reg.update().catch(() => {}), 60 * 60 * 1000);
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('🔄 Nuova versione PWA disponibile. Ricarica per aggiornare.');
+            }
+          });
+        });
+      })
+      .catch((err) => console.warn('Service Worker non registrato:', err));
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderProfiles();
+  const p = new URLSearchParams(location.search);
+  const d = p.get('date'); if(d) document.getElementById('birthdate').value = d;
+  const n = p.get('name'); if(n) document.getElementById('name').value = n;
+  if(d) calculate();
+  document.getElementById('birthdate').max = new Date().toISOString().split('T')[0];
+  // Carica la chiave salvata
+  loadApiKey();
+  // Stato backend Swiss Ephemeris
+  initBackendUi();
+  // Traduttore open source (GitHub Pages ready)
+  initTranslateUi();
+  // Notifiche compleanno
+  if(localStorage.getItem('cb_notify')==='1' && "Notification" in window && Notification.permission === "granted"){
+    const profiles = loadProfiles().filter(x=>x.calc);
+    const today = new Date(); const mmdd = today.getMonth()+'-'+today.getDate();
+    profiles.forEach(p=>{ const b = new Date(p.calc.birthISO); if(b.getMonth()+'-'+b.getDate() === mmdd){ new Notification("🎂 ChronoBirth", {body:`Oggi è il compleanno di ${p.name}!`}); }});
+  }
+});
+
+console.log('✅ ChronoBirth avviato con successo!');
+</script>
+</body>
+</html>

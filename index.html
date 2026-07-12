@@ -2282,7 +2282,7 @@ function renderProfiles(){
     div.innerHTML = `<div><strong>${p.name}</strong><br><small>${p.birthdateStr} · ${p.calc.zodiac.name}</small></div><div class="actions"><button class="edit" data-idx="${idx}">✎</button><button class="del" data-idx="${idx}">×</button></div>`;
     div.addEventListener('click', (e) => { if(e.target.closest('.actions')) return; loadProfileIntoForm(p); });
     div.querySelector('.del').addEventListener('click', (e) => { e.stopPropagation(); const idx2 = parseInt(e.target.dataset.idx); const arr = loadProfiles(); const realIdx = arr.findIndex(x => x.calc && x.calc.zodiac && x.calc.zodiac.name && x.name === p.name && x.birthdateStr === p.birthdateStr); if(realIdx !== -1){ arr.splice(realIdx, 1); saveProfiles(arr); } });
-    div.querySelector('.edit').addEventListener('click', (e) => { e.stopPropagation(); const idx2 = parseInt(e.target.dataset.idx); const arr = loadProfiles(); const realIdx = arr.findIndex(x => x.calc && x.calc.zodiac && x.calc.zodiac.name && x.name === p.name && x.birthdateStr === p.birthdateStr); if(realIdx === -1) return; loadProfileIntoForm(p); arr.splice(realIdx, 1); saveProfiles(arr); document.getElementById('saveHint').textContent = "Modifica in corso: ricalcola e salva per aggiornare."; });
+    div.querySelector('.edit').addEventListener('click', (e) => { e.stopPropagation(); loadProfileIntoForm(p); const hint = document.getElementById('saveHint'); if(hint) hint.textContent = "Profilo caricato per modifica. Ricalcola e premi Salva per aggiornare (il profilo resta in elenco)."; });
     el.appendChild(div);
     const optA = document.createElement('option'); optA.value = idx; optA.textContent = `${p.name} (${p.calc.zodiac.name})`;
     ca.appendChild(optA);
@@ -2858,5 +2858,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 console.log('✅ ChronoBirth avviato con successo!');
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a19c371c3fe2eda6',t:'MTc4MzgxOTEyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

@@ -190,7 +190,8 @@
           <button class="btn" id="btnCheckBackend" type="button">↻</button>
         </div>
         <p class="small" style="margin-top:4px;font-style:italic;">
-          Se il backend non risponde, l’app usa il fallback astronomico nel browser.
+          URL predefinito: <code>https://chronobirth-api.onrender.com</code> (già implementato nell’app).<br>
+          Se il backend non risponde (sleep Render), l’app usa il fallback nel browser.
         </p>
       </div>
       <hr class="sep">
@@ -1853,26 +1854,49 @@ function ascendantLongitude(date, latitude, longitude){
 }
 
 // ============================================================
-// BACKEND SWISS EPHEMERIS (opzionale)
+// BACKEND (opzionale) – URL implementato nell'app
 // ============================================================
-function backendBaseUrl(){ const saved = localStorage.getItem('cb_backend_url'); if(saved) return saved.replace(/\/$/,''); if(location.protocol === 'http:' || location.protocol === 'https:') return location.origin; return ''; }
+// Backend online predefinito (Render Free).
+// Su GitHub Pages viene usato in automatico se non hai salvato un altro URL.
+// In locale (localhost) si preferisce lo stesso origin (avvia.bat / uvicorn).
+const DEFAULT_BACKEND_URL = 'https://chronobirth-api.onrender.com';
+
+function isLocalHost(){
+  const h = (location.hostname || '').toLowerCase();
+  return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '[::1]';
+}
+
+function backendBaseUrl(){
+  const saved = (localStorage.getItem('cb_backend_url') || '').trim().replace(/\/$/,'');
+  if (saved) return saved;
+  // Locale: stesso origin se apri da http://127.0.0.1:8080 (backend+static insieme)
+  if (isLocalHost() && (location.protocol === 'http:' || location.protocol === 'https:')) {
+    return location.origin;
+  }
+  // GitHub Pages / produzione: backend Render già configurato nell'app
+  if (location.protocol === 'http:' || location.protocol === 'https:') {
+    return DEFAULT_BACKEND_URL;
+  }
+  return DEFAULT_BACKEND_URL;
+}
 
 async function checkBackendStatus(){
   const el = document.getElementById('backendStatus');
   const input = document.getElementById('backendUrlInput');
   if(!el) return false;
   const base = backendBaseUrl();
+  const saved = (localStorage.getItem('cb_backend_url') || '').trim().replace(/\/$/,'');
   if(input && document.activeElement !== input){
-    const saved = localStorage.getItem('cb_backend_url') || '';
-    input.value = saved;
-    input.placeholder = base ? `Vuoto = ${base}` : 'Es. http://localhost:8765';
+    // Mostra l'URL effettivo (salvato o default implementato)
+    input.value = saved || base || '';
+    input.placeholder = `Predefinito: ${DEFAULT_BACKEND_URL}`;
   }
   if(!base){
     el.innerHTML = '⚠️ Nessun backend configurato. Calcolo solo nel browser.';
     el.style.color = 'var(--yellow)';
     return false;
   }
-  el.textContent = 'Controllo backend Swiss Ephemeris…';
+  el.textContent = 'Controllo backend… (su Render Free può richiedere 30–60s al primo avvio)';
   el.style.color = 'var(--muted)';
   const controller = new AbortController();
   const timer = setTimeout(()=>controller.abort(), 60000); // 60s: cold start Render Free
@@ -1880,12 +1904,14 @@ async function checkBackendStatus(){
     const res = await fetch(`${base}/api/health`, { signal: controller.signal, cache: 'no-store' });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
+    const eng = data.engine || 'Backend';
     const ver = data.engine_version || data.version || '';
-    el.innerHTML = `✅ Backend attivo · <strong>Swiss Ephemeris ${ver}</strong><br><span style="opacity:.85">${base}</span>`;
+    const names = data.names_count != null ? ` · ${data.names_count} nomi` : '';
+    el.innerHTML = `✅ Backend attivo · <strong>${eng} ${ver}</strong>${names}<br><span style="opacity:.85">${base}</span>`;
     el.style.color = 'var(--green)';
     return true;
   }catch(err){
-    el.innerHTML = `❌ Backend non raggiungibile su <code>${base}</code>. Uso fallback browser.<br><span style="opacity:.85">Se usi Render Free, attendi 30–60s (cold start) e premi ↻. In locale: avvia <code>avvia.bat</code>.</span>`;
+    el.innerHTML = `❌ Backend non raggiungibile su <code>${base}</code>. Uso fallback browser.<br><span style="opacity:.85">Se usi Render Free, attendi 30–60s (cold start) e premi ↻. In locale: avvia il server backend.</span>`;
     el.style.color = 'var(--red)';
     return false;
   }finally{
@@ -1897,6 +1923,10 @@ function initBackendUi(){
   const saveBtn = document.getElementById('btnSaveBackendUrl');
   const checkBtn = document.getElementById('btnCheckBackend');
   const input = document.getElementById('backendUrlInput');
+  // Precompila con default se non c'è un URL salvato
+  if (input && !(localStorage.getItem('cb_backend_url') || '').trim()) {
+    input.value = DEFAULT_BACKEND_URL;
+  }
   if(saveBtn){
     saveBtn.onclick = ()=>{
       const v = (input?.value || '').trim().replace(/\/$/,'');
@@ -2802,5 +2832,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 console.log('✅ ChronoBirth avviato con successo!');
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a19c10e96c27ee51',t:'MTc4MzgxNzU1NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

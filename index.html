@@ -335,6 +335,12 @@
               <h4>Ascendente e dati astrologici</h4>
               <table class="natal-table" id="natalTable"></table>
               <p class="small" style="margin-top:6px">Nota tecnica: se il backend è attivo, ascendente, case, Sole, Luna, pianeti e transiti vengono calcolati con Swiss Ephemeris. Altrimenti fallback astronomico browser.</p>
+              <button class="btn" id="btnCopyTema" type="button" style="width:100%;margin-top:10px;">📋 Copia tema completo (con Asc/MC)</button>
+              <p class="small" style="margin-top:6px;color:var(--muted);line-height:1.5">
+                Dopo la copia, <strong>incolla il testo su internet</strong> in un’AI online
+                (ChatGPT, Gemini, Claude, ecc.) e chiedi l’interpretazione completa del tema.
+              </p>
+              <p class="small" id="copyTemaHint" style="margin-top:6px;"></p>
               <div class="block"><h4>Transiti di oggi</h4><p class="small" id="transitsToday"></p></div>
             </div>
           </div>
@@ -2131,7 +2137,7 @@ function render(){
   [`Numero destino: ${r.lifePath}`,`Pianeta: ${r.zodiac.planet}`,`Pietra: ${r.zodiac.stone}`,`Colore: ${r.zodiac.color}`,`Fiore: ${r.zodiac.flower}`,`Metallo: ${r.zodiac.metal}`,`Elemento: ${r.zodiac.el}`,`Modalità: ${r.zodiac.mode}`,`Cinese: ${r.chinese.element}`,`Calcolo: ${r.calculationSource || 'Browser'}`].forEach(t=>{ const s=document.createElement('span'); s.className='pill'; s.textContent=t; symbolsEl.appendChild(s); });
 
   const personalHoro = buildHoroscope(r);
-  document.getElementById('dailyHoroscope').textContent = personalHoro.text;
+  document.getElementById('dailyHoroscope').innerHTML = personalHoro.text;
   document.getElementById('dailyHoroscopeTech').innerHTML = personalHoro.tech;
   document.getElementById('personalSummary').textContent = buildPersonalSummary(r);
 
@@ -2160,39 +2166,134 @@ function render(){
   renderBirthdayCalendar();
 }
 
+function _escHoro(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _aspectTone(aspect){
+  const a = (aspect || '').toLowerCase();
+  if(a.includes('trigono') || a.includes('sestile')) return 'armonico';
+  if(a.includes('quadratura') || a.includes('opposizione')) return 'dinamico';
+  if(a.includes('congiunzione')) return 'intensificante';
+  return 'significativo';
+}
+function _transitAdvice(t){
+  const mover = (t.transit || t.mover || '').toLowerCase();
+  const target = (t.natal || t.target || '').toLowerCase();
+  const kind = _aspectTone(t.aspect);
+  const tips = [];
+  if(mover.includes('luna')) tips.push('sensibilità e umore più variabili: meglio decisioni non impulsive');
+  if(mover.includes('sole')) tips.push('più visibilità e bisogno di coerenza con ciò che vuoi mostrare');
+  if(mover.includes('mercurio')) tips.push('mente e comunicazioni in primo piano: chiarisci messaggi e scadenze');
+  if(mover.includes('venere')) tips.push('relazioni, estetica e valori personali più sensibili al contesto');
+  if(mover.includes('marte')) tips.push('energia e iniziativa più marcate: canalizza senza forzare gli altri');
+  if(mover.includes('giove')) tips.push('apertura e fiducia in crescita: attenzione a non promettere troppo');
+  if(mover.includes('saturno')) tips.push('richiesta di struttura, limiti e responsabilità concrete');
+  if(target.includes('sole')) tips.push('tocca l’identità e le priorità centrali');
+  if(target.includes('luna')) tips.push('tocca bisogni emotivi e abitudini di cura');
+  if(target.includes('ascendente') || target.includes('asc')) tips.push('influisce su immagine, approccio e prime impressioni');
+  if(target.includes('venere')) tips.push('coinvolge affetti, piacere e negoziazione');
+  if(target.includes('marte')) tips.push('mette in gioco assertività e gestione dei conflitti');
+  if(kind === 'armonico') tips.push('il clima è più fluido: è un buon momento per consolidare');
+  if(kind === 'dinamico') tips.push('c’è tensione utile: meglio agire con metodo che reagire d’impulso');
+  if(kind === 'intensificante') tips.push('il tema si concentra: meno dispersione, più chiarezza sul punto centrale');
+  if(!tips.length) tips.push('osserva dove metti attenzione e tempo: lì si gioca il segnale del giorno');
+  // unique, max 3
+  return [...new Set(tips)].slice(0,3).join('; ');
+}
+function _moonDayGuide(moonNow){
+  const n = moonNow.name || '';
+  if(n.includes('Piena')) return {
+    title: 'Luna Piena',
+    text: 'Culmine e maggiore consapevolezza: utile per bilanciare, chiarire rapporti e chiudere cicli. Evita decisioni solo emotive a fine giornata.'
+  };
+  if(n.includes('Nuova')) return {
+    title: 'Luna Nuova',
+    text: 'Inizio di ciclo: meglio impostare, semplificare e scegliere una sola priorità. Meno eccesso di impegni, più direzione.'
+  };
+  if(n.includes('Crescente') || n.includes('Primo Quarto') || n.includes('Quarto')) return {
+    title: 'Luna crescente',
+    text: 'Fase di costruzione: avanzano progetti e abitudini se resti costante. Preferisci passi misurabili a grandi annunci.'
+  };
+  return {
+    title: 'Luna calante',
+    text: 'Fase di revisione: ottima per sistemare dettagli, recuperare energie e lasciar andare ciò che non è più utile.'
+  };
+}
+function _elementDayFocus(el){
+  if(el === 'Fuoco') return {work:'iniziativa e leadership leggera', rel:'onestà diretta, senza impazienza', body:'movimento e scarico fisico'};
+  if(el === 'Terra') return {work:'organizzazione, scadenze, concretezza', rel:'affidabilità e presenza pratica', body:'ritmo stabile e riposo regolare'};
+  if(el === 'Aria') return {work:'idee, messaggi, coordinamento', rel:'ascolto e dialogo chiaro', body:'pause mentali e aria aperta'};
+  return {work:'cura, intuizione, qualità del clima emotivo', rel:'empatia con confini', body:'idratazione, sonno, riduzione degli stimoli'};
+}
 function buildHoroscope(r){
   const now = new Date();
   const moonNow = moonPhase(now);
+  const dateIt = now.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const natalSun = r.planetDetails?.Sole?.sign || r.zodiac?.name || '—';
+  const natalMoon = r.planetDetails?.Luna?.sign || r.planets?.Luna || '—';
+  const natalAsc = r.asc?.name && r.asc.name !== '—' ? r.asc.name : (r.planetDetails?.Ascendente?.sign || '—');
+  const el = r.zodiac?.el || 'Aria';
+  const focus = _elementDayFocus(el);
+  const moonGuide = _moonDayGuide(moonNow);
+
+  let sunText, moonText, major, engineLabel, techExtra;
   if(r.swissData?.current_sky?.planets){
     const sky = r.swissData.current_sky.planets;
-    const primary = r.swissData.transits?.[0];
-    const base = `${r.name}, oggi il Sole transita a ${sky.Sole.text} e la Luna a ${sky.Luna.text}.`;
-    const transitText = primary ? ` Transito principale da Swiss Ephemeris: ${primary.transit} in ${primary.aspect} a ${primary.natal} natale, orb ${Number(primary.orb).toFixed(1)}°.` : ' Non emergono aspetti maggiori stretti sui punti natali principali.';
-    const moonTone = moonNow.name.includes('Piena') ? 'La fase lunare piena amplifica consapevolezza, relazioni e bisogno di chiarezza.' :
-      moonNow.name.includes('Nuova') ? 'La fase di Luna Nuova favorisce impostazione, semina e ripartenze.' :
-      moonNow.name.includes('Crescente') || moonNow.name.includes('Quarto') ? 'La Luna crescente sostiene costruzione, decisioni progressive e sviluppo.' :
-      'La Luna calante favorisce revisione, chiusura di dettagli e recupero di energia.';
-    return {
-      text: `${base}${transitText} ${moonTone}`,
-      tech: `<strong>Motore:</strong> Swiss Ephemeris backend (${r.swissData.engine_version || 'versione non indicata'}).<br><strong>Transiti rilevati:</strong> ${(r.swissData.transits||[]).slice(0,5).map(swissTransitText).join(' · ') || 'nessun aspetto maggiore stretto'}.`
-    };
+    sunText = sky.Sole?.text || '—';
+    moonText = sky.Luna?.text || '—';
+    major = (r.swissData.transits || []).slice(0,5).map(t => ({
+      transit: t.transit, aspect: t.aspect, natal: t.natal, orb: Number(t.orb)
+    }));
+    engineLabel = `Swiss Ephemeris (${r.swissData.engine_version || 'backend'})`;
+    techExtra = (r.swissData.transits || []).slice(0,6).map(swissTransitText).join(' · ') || 'nessun aspetto maggiore stretto';
+  } else {
+    const transits = ephemerisPositions(now);
+    sunText = transits.Sole?.text || '—';
+    moonText = transits.Luna?.text || '—';
+    major = findMajorTransits(r, now).slice(0,5);
+    engineLabel = r.calculationSource || 'Fallback astronomico browser / backend';
+    techExtra = major.length
+      ? major.map(x => `${x.transit} ${x.aspect} ${x.natal} (${Number(x.orb).toFixed(1)}°)`) .join(' · ')
+      : 'nessun aspetto maggiore stretto';
   }
-  const transits = ephemerisPositions(now);
-  const major = findMajorTransits(r, now);
+
   const primary = major[0];
-  const sunNow = transits.Sole;
-  const moonSign = transits.Luna;
-  const base = `${r.name}, oggi il Sole transita a ${sunNow.text} e la Luna a ${moonSign.text}.`;
-  const transitText = primary ? ` Transito principale rilevato: ${primary.transit} in ${primary.aspect} a ${primary.natal} natale, orb ${primary.orb.toFixed(1)}°.` : ` Non emergono aspetti maggiori stretti tra i pianeti rapidi e i punti natali principali: giornata da leggere soprattutto attraverso Sole e Luna.`;
-  const moonTone = moonNow.name.includes('Piena') ? 'La fase lunare piena amplifica consapevolezza, relazioni e bisogno di chiarezza.' :
-    moonNow.name.includes('Nuova') ? 'La fase di Luna Nuova favorisce impostazione, semina e ripartenze.' :
-    moonNow.name.includes('Crescente') || moonNow.name.includes('Quarto') ? 'La Luna crescente sostiene costruzione, decisioni progressive e sviluppo.' :
-    'La Luna calante favorisce revisione, chiusura di dettagli e recupero di energia.';
-  const list = major.length ? major.map(x=>`${x.transit} ${x.aspect} ${x.natal} (${x.orb.toFixed(1)}°)`).join(' · ') : 'nessun aspetto maggiore stretto';
-  return {
-    text: `${base}${transitText} ${moonTone}`,
-    tech: `<strong>Dati usati:</strong> tema natale calcolato in gradi e cielo attuale calcolato in gradi. Aspetti considerati: congiunzione, sestile, quadratura, trigono, opposizione.<br><strong>Transiti rilevati:</strong> ${list}.<br><strong>Nota tecnica:</strong> fallback astronomico lato browser; avvia il backend Swiss Ephemeris per la massima precisione.`
-  };
+  const dayTheme = primary
+    ? `${primary.transit} in ${_escHoro(primary.aspect)} sul/la ${primary.natal} natale (orb ${Number(primary.orb).toFixed(1)}°): ${_escHoro(_transitAdvice(primary))}.`
+    : `Non ci sono aspetti maggiori strettissimi sui punti principali: la lettura del giorno resta legata a Sole, Luna e al tuo temperamento di ${ _escHoro(r.zodiac?.name || 'base') }.`;
+
+  const otherTransits = major.slice(1,4).map(t =>
+    `<li><strong>${_escHoro(t.transit)} ${_escHoro(t.aspect)} ${_escHoro(t.natal)}</strong> (${Number(t.orb).toFixed(1)}°) — ${_escHoro(_transitAdvice(t))}</li>`
+  ).join('');
+
+  const text = `
+    <div style="line-height:1.65;color:var(--muted)">
+      <p style="color:var(--text);font-weight:700;margin-bottom:8px">${_escHoro(r.name)} · oroscopo del ${ _escHoro(dateIt) }</p>
+      <p style="margin-bottom:10px">
+        Lettura personale basata sul tema (Sole ${_escHoro(natalSun)}, Luna ${_escHoro(natalMoon)}${natalAsc !== '—' ? `, Asc ${_escHoro(natalAsc)}` : ''})
+        e sul cielo di oggi (Sole ${_escHoro(sunText)}, Luna ${_escHoro(moonText)}).
+        Non è una predizione certa: è una mappa di priorità e di clima.
+      </p>
+      <p style="margin-bottom:8px"><strong style="color:var(--text)">1. Clima del giorno</strong><br>${dayTheme}</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--text)">2. ${ _escHoro(moonGuide.title) }</strong><br>${_escHoro(moonGuide.text)} Fase: ${_escHoro(moonNow.emoji || '')} ${_escHoro(moonNow.name)} (${moonNow.pct}%).</p>
+      <p style="margin-bottom:8px"><strong style="color:var(--text)">3. Dove mettere attenzione</strong><br>
+        <strong>Lavoro / compiti:</strong> ${_escHoro(focus.work)}.<br>
+        <strong>Relazioni:</strong> ${_escHoro(focus.rel)}.<br>
+        <strong>Corpo / ritmo:</strong> ${_escHoro(focus.body)}.
+      </p>
+      ${otherTransits ? `<p style="margin-bottom:6px"><strong style="color:var(--text)">4. Altri transiti utili</strong></p><ul style="margin:0 0 10px 18px">${otherTransits}</ul>` : ''}
+      <p style="margin-bottom:0"><strong style="color:var(--text)">5. Consiglio pratico</strong><br>
+        Scegli <em>una</em> cosa importante e portala avanti con chiarezza. Se emergono tensioni, chiedi fatti e tempi prima di reagire.
+        Se la giornata è fluida, usala per sistemare e consolidare, non solo per iniziare di tutto.
+      </p>
+    </div>`;
+
+  const tech = `<strong>Metodo:</strong> confronto tra posizioni natali e cielo di oggi (aspetti maggiori: congiunzione, sestile, quadratura, trigono, opposizione).<br>
+    <strong>Motore:</strong> ${_escHoro(engineLabel)}.<br>
+    <strong>Transiti considerati:</strong> ${_escHoro(techExtra)}.<br>
+    <strong>Trasparenza:</strong> interpretazione assistita da regole astrologiche dell’app; non sostituisce una consulenza professionale.`;
+
+  return { text, tech };
 }
 function getEventsFor(day, month){ const key = `${day}-${month}`; if(EVENTS_DB[key]) return EVENTS_DB[key].split(" • "); return ["Un giorno perfetto per iniziare qualcosa di nuovo.", `Segno del giorno: ${getZodiac(month, day).name}`]; }
 
@@ -2307,6 +2408,27 @@ function loadProfileIntoForm(p){
   currentResult = p.calc || null;
   if(currentResult) render(); else calculate();
 }
+function resetFormAfterSave(){
+  // Pulisce form e risultato dopo un salvataggio riuscito
+  currentResult = null;
+  birthLocation = null;
+  const ids = ['name','birthdate','birthtime','place'];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  const pr = document.getElementById('placeResults');
+  if(pr){ pr.innerHTML = ''; pr.style.display = 'none'; }
+  const det = document.getElementById('locationDetails');
+  if(det){ det.style.display = 'none'; det.innerHTML = ''; }
+  const th = document.getElementById('t_timehint');
+  if(th){ th.textContent = 'Inserisci città e nazione, poi premi Cerca.'; th.style.color = ''; }
+  const empty = document.getElementById('emptyState');
+  const wrap = document.getElementById('resultWrap');
+  if(empty) empty.style.display = '';
+  if(wrap) wrap.classList.remove('show');
+  // tab profilo attiva di default
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === 'profilo'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-profilo'));
+}
+
 function saveCurrentProfile(){
   if(!currentResult || !currentResult.zodiac){
     alert("Prima premi «Calcola profilo completo», poi «Salva profilo».");
@@ -2325,9 +2447,9 @@ function saveCurrentProfile(){
     savedAt: new Date().toISOString()
   });
   saveProfiles(filtered);
+  resetFormAfterSave();
   const hint = document.getElementById('saveHint');
-  if(hint) hint.textContent = "✓ Profilo salvato. Lo trovi a sinistra in «Profili salvati».";
-  // porta in vista la lista profili
+  if(hint) hint.textContent = "✓ Profilo salvato. Form pronto per un nuovo profilo.";
   const list = document.getElementById('profilesList');
   if(list) list.scrollIntoView({behavior:'smooth', block:'nearest'});
   return true;
@@ -2407,12 +2529,129 @@ document.getElementById('btnNotify').onclick = async ()=>{
 // ============================================================
 // CONDIVISIONE
 // ============================================================
+function buildFullThemeText(r){
+  const lines = [];
+  lines.push('TEMA NATALE COMPLETO — ChronoBirth');
+  lines.push('================================');
+  lines.push(`Nome: ${r.name}`);
+  lines.push(`Data: ${r.day}/${r.month}/${r.year} (${r.weekday})`);
+  if(r.birthtimeStr) lines.push(`Ora di nascita: ${r.birthtimeStr}`);
+  if(r.place) lines.push(`Luogo: ${r.place}`);
+  if(r.location?.lat != null && r.location?.lon != null){
+    lines.push(`Coordinate: ${Number(r.location.lat).toFixed(4)}, ${Number(r.location.lon).toFixed(4)}`);
+  }
+  if(r.location?.timezone) lines.push(`Fuso: ${r.location.timezone}`);
+  if(r.birthISO) lines.push(`UTC/ISO usato: ${r.birthISO}`);
+  lines.push(`Motore di calcolo: ${r.calculationSource || 'Browser'}`);
+  lines.push('');
+  lines.push('PUNTI CHIAVE');
+  lines.push(`- Sole: ${r.planetDetails?.Sole?.text || r.zodiac?.name || '—'}`);
+  lines.push(`- Luna: ${r.planetDetails?.Luna?.text || r.planets?.Luna || r.moon?.name || '—'}`);
+  const ascText = r.asc?.degreeText || r.planetDetails?.Ascendente?.text || r.asc?.name || '—';
+  const mcText = r.planetDetails?.['Medio Cielo']?.text || r.planetDetails?.MC?.text || '—';
+  lines.push(`- Ascendente: ${ascText}`);
+  lines.push(`- Medio Cielo (MC): ${mcText}`);
+  if(r.zodiac) lines.push(`- Segno solare (rif.): ${r.zodiac.emoji || ''} ${r.zodiac.name} · ${r.zodiac.el}/${r.zodiac.mode} · reggente ${r.zodiac.planet}`);
+  if(r.chinese) lines.push(`- Cinese: ${r.chinese.emoji || ''} ${r.chinese.name} · ${r.chinese.element}`);
+  if(r.lifePath != null) lines.push(`- Numero destino: ${r.lifePath}`);
+  if(r.moon) lines.push(`- Fase lunare alla nascita: ${r.moon.emoji || ''} ${r.moon.name} (${r.moon.pct}%)`);
+  lines.push('');
+  lines.push('POSIZIONI NATALI (pianeti + angoli)');
+  const pd = r.planetDetails || {};
+  const order = [...PLANET_LABELS, 'Ascendente', 'Medio Cielo'];
+  // evita doppioni e include eventuali altri punti presenti
+  const seen = new Set();
+  order.forEach(k => {
+    if(!pd[k] || seen.has(k)) return;
+    seen.add(k);
+    const d = pd[k];
+    const text = typeof d === 'string' ? d : (d?.text || d?.sign || '—');
+    const lon = (typeof d === 'object' && d.longitude != null && !isNaN(d.longitude)) ? ` · lon ${Number(d.longitude).toFixed(2)}°` : '';
+    const retro = (typeof d === 'object' && d.retrograde) ? ' ℞' : '';
+    lines.push(`- ${k}: ${text}${retro}${lon}`);
+  });
+  Object.keys(pd).forEach(k => {
+    if(seen.has(k)) return;
+    const d = pd[k];
+    const text = typeof d === 'string' ? d : (d?.text || d?.sign || '—');
+    const lon = (typeof d === 'object' && d.longitude != null && !isNaN(d.longitude)) ? ` · lon ${Number(d.longitude).toFixed(2)}°` : '';
+    const retro = (typeof d === 'object' && d.retrograde) ? ' ℞' : '';
+    lines.push(`- ${k}: ${text}${retro}${lon}`);
+  });
+  // Case se presenti (backend Swiss)
+  const houses = r.swissData?.natal?.houses || r.houses || null;
+  if(Array.isArray(houses) && houses.length){
+    lines.push('');
+    lines.push('CASE (cuspidi, se disponibili)');
+    houses.forEach((h, i) => {
+      if(h == null || h === '') return;
+      if(typeof h === 'number') lines.push(`- Casa ${i + 1}: ${h.toFixed(2)}°`);
+      else if(typeof h === 'object') lines.push(`- Casa ${h.number || i + 1}: ${h.text || h.sign || JSON.stringify(h)}`);
+      else lines.push(`- Casa ${i + 1}: ${h}`);
+    });
+  }
+  // Transiti del giorno se già in pagina
+  const trEl = document.getElementById('transitsToday');
+  if(trEl && trEl.textContent && trEl.textContent.trim()){
+    lines.push('');
+    lines.push('TRANSITI DI OGGI (rilevati dall\'app)');
+    lines.push(trEl.textContent.trim());
+  }
+  lines.push('');
+  lines.push('ISTRUZIONI PER L\'AI (incolla questo blocco su internet in un\'AI online)');
+  lines.push('Usa SOLO i dati sopra. Non inventare pianeti, gradi, case o ascendenti assenti.');
+  lines.push('Se Ascendente o MC mancano o sono incompleti, dillo esplicitamente (servono ora e luogo precisi).');
+  lines.push('Scrivi in italiano un\'interpretazione completa e seria: sintesi del tema, Sole/Luna/Ascendente, pianeti rilevanti, stili affettivi e lavorativi, sfide, punti di forza, e 5 consigli pratici.');
+  lines.push('Tono chiaro e non superstizioso; niente certezze assolute sul destino.');
+  return lines.join('\n');
+}
+
+async function copyTextSmart(txt){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(txt);
+      return true;
+    }
+  }catch(e){}
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){
+    return false;
+  }
+}
+
 document.getElementById('btnCopy').onclick = ()=>{
   if(!currentResult) return;
   const r = currentResult;
   const txt = `${r.name} • ${r.weekday} ${r.day}/${r.month}/${r.year}\nSegno: ${r.zodiac.name} ${r.zodiac.emoji} • Cinese: ${r.chinese.name} ${r.chinese.element}\nLuna: ${r.moon.name} • Età ${r.ageY} • Destino ${r.lifePath}\nChronoBirth`;
-  navigator.clipboard.writeText(txt).then(()=> alert("Riepilogo copiato!"));
+  copyTextSmart(txt).then(ok => alert(ok ? "Riepilogo copiato!" : "Copia non riuscita"));
 };
+
+const btnCopyTema = document.getElementById('btnCopyTema');
+if(btnCopyTema){
+  btnCopyTema.onclick = async ()=>{
+    if(!currentResult){
+      alert('Prima calcola un profilo.');
+      return;
+    }
+    const txt = buildFullThemeText(currentResult);
+    const ok = await copyTextSmart(txt);
+    const hint = document.getElementById('copyTemaHint');
+    if(hint) hint.textContent = ok
+      ? '✓ Copiato. Ora aprilo su internet (ChatGPT, Gemini, Claude…) e incolla il testo per l’oroscopo completo.'
+      : 'Copia non riuscita. Seleziona e copia manualmente dal tema.';
+    if(ok) alert('Tema completo copiato (con Ascendente/MC).\n\nOra aprilo su internet in un’AI online (ChatGPT, Gemini, Claude, ecc.) e incolla il testo per ricevere l’interpretazione completa.');
+  };
+}
 document.getElementById('btnShare').onclick = async ()=>{
   if(!currentResult) return;
   const url = location.href.split('?')[0] + `?date=${currentResult.birthdateStr}&name=${encodeURIComponent(currentResult.name)}`;
@@ -2858,5 +3097,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 console.log('✅ ChronoBirth avviato con successo!');
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a19c371c3fe2eda6',t:'MTc4MzgxOTEyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a37bdd0ce3edc0',t:'MTc4Mzg5NTMzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

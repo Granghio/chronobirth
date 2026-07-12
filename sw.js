@@ -2,7 +2,7 @@
  * Cache-first per asset statici, network-first per le API esterne.
  * Versione cache: aggiorna CACHE_VERSION quando cambi i file.
  */
-const CACHE_VERSION = 'chronobirth-v7';
+const CACHE_VERSION = 'chronobirth-v8';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 

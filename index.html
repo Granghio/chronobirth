@@ -180,7 +180,8 @@
         <div id="locationDetails" class="location-details" style="display:none;"></div>
       </div>
       <button class="btn-primary" id="btnCalc">Calcola profilo completo →</button>
-      <p class="hint">Offline • LocalStorage • PWA</p>
+      <button class="btn" id="btnSaveProfileLeft" type="button" style="width:100%;margin-top:8px;background:linear-gradient(90deg,#7c3aed,#22d3ee);border:none;color:#fff;font-weight:800;">💾 Salva profilo</button>
+      <p class="hint">Offline • LocalStorage • PWA · dopo Calcola usa Salva</p>
       <div class="api-key-field" id="backendStatusBox" style="margin-top:10px;">
         <h2>🪐 Motore di calcolo</h2>
         <p class="small" id="backendStatus">Controllo backend Swiss Ephemeris…</p>
@@ -277,6 +278,12 @@
           <h2>Pronto a creare il tuo profilo?</h2>
           <p>Inserisci nome, data, ora e luogo di nascita.</p>
           <p class="small" style="margin-top:6px">Giorno, Zodiaco, Ascendente, Compatibilità</p>
+          <p class="small" style="margin-top:12px;padding:10px;border:1px dashed var(--border);border-radius:12px;line-height:1.5">
+            <strong>Come salvare:</strong><br>
+            1) Premi <strong>Calcola profilo completo</strong><br>
+            2) Scorri in basso a destra<br>
+            3) Premi il pulsante viola <strong>💾 Salva profilo</strong>
+          </p>
         </div>
       </div>
       <div id="resultWrap" class="result-wrap">
@@ -347,12 +354,12 @@
           <div class="block"><h4>Significato del nome</h4><p class="small" id="nameMeaning">—</p></div>
         </div>
         <hr class="sep">
-        <div class="actions">
+        <div class="actions" id="resultActions" style="position:sticky;bottom:8px;z-index:5;background:var(--card);padding:10px;border-radius:14px;border:1px solid var(--border);">
           <button class="btn" id="btnShare">🔗 Condividi</button>
           <button class="btn" id="btnWhats">💬 WhatsApp</button>
           <button class="btn" id="btnCopy">📋 Copia</button>
           <button class="btn" id="btnCard">🖼️ Card PNG</button>
-          <button class="btn" id="btnSaveProfile">💾 Salva</button>
+          <button class="btn" id="btnSaveProfile" style="background:linear-gradient(90deg,#7c3aed,#22d3ee);border:none;color:#fff;font-weight:800;">💾 Salva profilo</button>
         </div>
         <p class="small" id="saveHint" style="margin-top:6px;"></p>
       </div>
@@ -2300,16 +2307,35 @@ function loadProfileIntoForm(p){
   currentResult = p.calc || null;
   if(currentResult) render(); else calculate();
 }
-document.getElementById('btnSaveProfile').onclick = () => {
-  if(!currentResult || !currentResult.zodiac){ alert("Calcola prima il profilo completo."); return; }
+function saveCurrentProfile(){
+  if(!currentResult || !currentResult.zodiac){
+    alert("Prima premi «Calcola profilo completo», poi «Salva profilo».");
+    return false;
+  }
   const profiles = loadProfiles();
   const exists = profiles.some(p => p.name === currentResult.name && p.birthdateStr === currentResult.birthdateStr);
-  if(exists && !confirm("Esiste già un profilo con questo nome e data. Vuoi sovrascriverlo?")) return;
+  if(exists && !confirm("Esiste già un profilo con questo nome e data. Vuoi sovrascriverlo?")) return false;
   const filtered = profiles.filter(p => !(p.name === currentResult.name && p.birthdateStr === currentResult.birthdateStr));
-  filtered.push({ name: currentResult.name, birthdateStr: currentResult.birthdateStr, birthtimeStr: currentResult.birthtimeStr, place: currentResult.place, calc: currentResult, savedAt: new Date().toISOString() });
+  filtered.push({
+    name: currentResult.name,
+    birthdateStr: currentResult.birthdateStr,
+    birthtimeStr: currentResult.birthtimeStr,
+    place: currentResult.place,
+    calc: currentResult,
+    savedAt: new Date().toISOString()
+  });
   saveProfiles(filtered);
-  document.getElementById('saveHint').textContent = "✓ Profilo salvato.";
-};
+  const hint = document.getElementById('saveHint');
+  if(hint) hint.textContent = "✓ Profilo salvato. Lo trovi a sinistra in «Profili salvati».";
+  // porta in vista la lista profili
+  const list = document.getElementById('profilesList');
+  if(list) list.scrollIntoView({behavior:'smooth', block:'nearest'});
+  return true;
+}
+const btnSaveProfile = document.getElementById('btnSaveProfile');
+if(btnSaveProfile) btnSaveProfile.onclick = saveCurrentProfile;
+const btnSaveProfileLeft = document.getElementById('btnSaveProfileLeft');
+if(btnSaveProfileLeft) btnSaveProfileLeft.onclick = saveCurrentProfile;
 
 // ============================================================
 // COMPATIBILITÀ
@@ -2832,5 +2858,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 console.log('✅ ChronoBirth avviato con successo!');
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a19c10e96c27ee51',t:'MTc4MzgxNzU1NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>

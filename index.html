@@ -335,12 +335,21 @@
               <h4>Ascendente e dati astrologici</h4>
               <table class="natal-table" id="natalTable"></table>
               <p class="small" style="margin-top:6px">Nota tecnica: se il backend è attivo, ascendente, case, Sole, Luna, pianeti e transiti vengono calcolati con Swiss Ephemeris. Altrimenti fallback astronomico browser.</p>
-              <button class="btn" id="btnCopyTema" type="button" style="width:100%;margin-top:10px;">📋 Copia tema completo (con Asc/MC)</button>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                <button class="btn" id="btnGeneraOroscopo" type="button" style="width:100%;background:linear-gradient(90deg,#7c3aed,#22d3ee);border:none;color:#fff;font-weight:800;">✨ Genera oroscopo completo</button>
+                <button class="btn" id="btnCopyTema" type="button" style="width:100%;">📋 Copia tema completo (con Asc/MC)</button>
+              </div>
               <p class="small" style="margin-top:6px;color:var(--muted);line-height:1.5">
-                Dopo la copia, <strong>incolla il testo su internet</strong> in un’AI online
-                (ChatGPT, Gemini, Claude, ecc.) e chiedi l’interpretazione completa del tema.
+                <strong>Genera oroscopo</strong> crea l’interpretazione nell’app (Sole, Luna, Ascendente e pianeti).<br>
+                <strong>Copia tema</strong>: poi <strong>incolla il testo su internet</strong> in un’AI online
+                (ChatGPT, Gemini, Claude, ecc.) per un approfondimento esterno.
               </p>
               <p class="small" id="copyTemaHint" style="margin-top:6px;"></p>
+              <div id="oroscopoCompletoBox" class="block" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--card-2);">
+                <h4 style="margin-bottom:8px;">✨ Oroscopo completo del tema</h4>
+                <div id="oroscopoCompleto" class="small" style="line-height:1.65;color:var(--muted);"></div>
+                <button class="btn" id="btnCopyOroscopo" type="button" style="width:100%;margin-top:10px;">📋 Copia oroscopo generato</button>
+              </div>
               <div class="block"><h4>Transiti di oggi</h4><p class="small" id="transitsToday"></p></div>
             </div>
           </div>
@@ -2529,6 +2538,167 @@ document.getElementById('btnNotify').onclick = async ()=>{
 // ============================================================
 // CONDIVISIONE
 // ============================================================
+function _planetLine(r, key){
+  const d = r.planetDetails?.[key];
+  if(!d) return null;
+  const text = typeof d === 'string' ? d : (d.text || d.sign || '—');
+  const retro = (typeof d === 'object' && d.retrograde) ? ' (retrogrado)' : '';
+  return `${key}: ${text}${retro}`;
+}
+function _signTraits(sign){
+  return ZMAP[sign]?.traits || 'qualità miste di adattamento e apprendimento';
+}
+function _signEl(sign){
+  return ZMAP[sign]?.el || null;
+}
+function _axisRead(sun, moon, asc){
+  const parts = [];
+  if(sun && moon && sun === moon) parts.push('Sole e Luna nello stesso segno: forte coerenza tra ciò che sei e ciò che senti, con rischio di monotematicità');
+  else if(sun && moon) parts.push(`Sole in ${sun} e Luna in ${moon}: il modo di agire (${_signTraits(sun).toLowerCase()}) incontra un bisogno emotivo più ${_signTraits(moon).toLowerCase()}`);
+  if(asc && asc !== '—' && sun && asc !== sun) parts.push(`L’Ascendente in ${asc} modula la prima impressione e l’approccio al mondo rispetto al Sole in ${sun}`);
+  else if(asc && asc !== '—' && sun && asc === sun) parts.push(`Ascendente e Sole in ${sun}: immagine esterna e nucleo identitario sono allineati, con grande riconoscibilità`);
+  if(!parts.length) parts.push('La combinazione Sole/Luna/Ascendente va letta insieme: identità, emozione e stile di ingresso nel mondo');
+  return parts.join('. ') + '.';
+}
+function _lifeAreaFromPlanets(r){
+  const p = r.planetDetails || {};
+  const get = k => (typeof p[k] === 'string' ? p[k] : p[k]?.sign) || null;
+  const ven = get('Venere');
+  const mar = get('Marte');
+  const mer = get('Mercurio');
+  const giove = get('Giove');
+  const sat = get('Saturno');
+  return {
+    love: ven ? `In affetti e piacere emerge lo stile di Venere in ${ven}: ${_signTraits(ven).toLowerCase()}.` : 'In affetti conta molto il dialogo tra Luna e Venere del tema.',
+    work: mar ? `Nell’azione e nel lavoro spinge Marte in ${mar}: ${_signTraits(mar).toLowerCase()}.` : 'Nel lavoro contano disciplina e ritmo personale più che un’unica formula.',
+    mind: mer ? `La mente e la comunicazione passano da Mercurio in ${mer}: ${_signTraits(mer).toLowerCase()}.` : 'La comunicazione va adattata al contesto e al pubblico.',
+    growth: giove ? `La crescita e le aperture ricordano Giove in ${giove}: ${_signTraits(giove).toLowerCase()}.` : 'La crescita arriva da esperienze che allargano lo sguardo.',
+    duty: sat ? `Impegni e struttura richiamano Saturno in ${sat}: ${_signTraits(sat).toLowerCase()}.` : 'Le responsabilità si costruiscono con costanza e limiti chiari.'
+  };
+}
+function buildCompleteOroscopo(r){
+  const sun = r.planetDetails?.Sole?.sign || r.zodiac?.name || '—';
+  const moon = r.planetDetails?.Luna?.sign || r.planets?.Luna || '—';
+  const asc = (r.asc?.name && r.asc.name !== '—') ? r.asc.name : (r.planetDetails?.Ascendente?.sign || '—');
+  const mc = r.planetDetails?.['Medio Cielo']?.sign || '—';
+  const sunT = r.planetDetails?.Sole?.text || sun;
+  const moonT = r.planetDetails?.Luna?.text || moon;
+  const ascT = r.asc?.degreeText || r.planetDetails?.Ascendente?.text || asc;
+  const mcT = r.planetDetails?.['Medio Cielo']?.text || mc;
+  const areas = _lifeAreaFromPlanets(r);
+  const el = r.zodiac?.el || _signEl(sun) || 'Aria';
+  const mode = r.zodiac?.mode || '—';
+  const name = r.name || 'Profilo';
+  const place = r.place ? ` · ${r.place}` : '';
+  const time = r.birthtimeStr ? ` alle ${r.birthtimeStr}` : '';
+  const date = `${r.day}/${r.month}/${r.year}`;
+  const engine = r.calculationSource || 'Browser';
+  const hasAsc = asc && asc !== '—';
+  const hasMC = mc && mc !== '—';
+
+  const planetLines = ['Mercurio','Venere','Marte','Giove','Saturno','Urano','Nettuno','Plutone','Nodo Nord']
+    .map(k => _planetLine(r, k))
+    .filter(Boolean);
+
+  const challenges = [];
+  if(el === 'Fuoco') challenges.push('rischio di fretta e di bruciare tappe');
+  if(el === 'Terra') challenges.push('rischio di rigidità o di attaccamento eccessivo al controllo');
+  if(el === 'Aria') challenges.push('rischio di disperdere energie in troppe idee');
+  if(el === 'Acqua') challenges.push('rischio di assorbire troppo il clima altrui');
+  if(mode === 'Cardinale') challenges.push('iniziare è facile: la sfida è portare a termine');
+  if(mode === 'Fisso') challenges.push('ottima tenuta: la sfida è restare flessibili al cambiamento');
+  if(mode === 'Mobile') challenges.push('grande adattabilità: la sfida è non perdere una direzione chiara');
+  if(!hasAsc) challenges.push('senza ora/luogo precisi l’Ascendente resta incompleto: l’interpretazione dell’immagine esterna è parziale');
+
+  const strengths = [];
+  strengths.push(`nucleo solare in ${sun}: ${_signTraits(sun).toLowerCase()}`);
+  if(moon && moon !== '—') strengths.push(`bisogno lunare in ${moon}: ${_signTraits(moon).toLowerCase()}`);
+  if(hasAsc) strengths.push(`stile di ingresso (Asc) in ${asc}: ${_signTraits(asc).toLowerCase()}`);
+  strengths.push(`elemento ${el.toLowerCase()} e modalità ${(mode || '').toLowerCase()} come firma del temperamento`);
+
+  const tips = [
+    'Traduci un talento del Sole in un’abitudine settimanale misurabile.',
+    'Ascolta la Luna: quando sei stanco, riduci stimoli prima di decidere.',
+    hasAsc ? 'Osserva come l’Ascendente ti fa “entrare” nelle situazioni e se ti allontana da ciò che vuoi davvero.' : 'Se puoi, completa ora e luogo di nascita per leggere meglio Ascendente e case.',
+    'In relazione, chiarisci bisogni (Luna) e stile di legame (Venere) senza dare per scontato l’altro.',
+    'Scegli una responsabilità Saturno-like: piccola, costante, visibile nei risultati.'
+  ];
+
+  const html = `
+    <p style="color:var(--text);font-weight:800;margin:0 0 8px 0">${_escHoro(name)} · oroscopo completo del tema</p>
+    <p style="margin:0 0 10px 0">Dati usati: nascita ${ _escHoro(date) }${_escHoro(time)}${_escHoro(place)}. Motore: ${_escHoro(engine)}. Interpretazione generata nell’app a partire da Sole, Luna, Ascendente e pianeti calcolati (non è una predizione assoluta né una consulenza professionale).</p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">1. Mappa essenziale</strong><br>
+      Sole: <strong>${_escHoro(sunT)}</strong><br>
+      Luna: <strong>${_escHoro(moonT)}</strong><br>
+      Ascendente: <strong>${_escHoro(ascT)}</strong>${hasAsc ? '' : ' <em>(incompleto senza ora/luogo)</em>'}<br>
+      Medio Cielo: <strong>${_escHoro(mcT)}</strong>${hasMC ? '' : ' <em>(se disponibile)</em>'}
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">2. Sintesi del tema</strong><br>
+      ${_escHoro(_axisRead(sun, moon, hasAsc ? asc : null))}
+      Il temperamento di base unisce elemento <strong>${_escHoro(el)}</strong> e modalità <strong>${_escHoro(mode)}</strong>.
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">3. Sole · identità e direzione</strong><br>
+      Con Sole in ${_escHoro(sun)} (${_escHoro(sunT)}) la spinta centrale è: ${_escHoro(_signTraits(sun).toLowerCase())}.
+      Qui si gioca il bisogno di riconoscersi e di “diventare qualcuno” in modo coerente.
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">4. Luna · bisogni e sicurezza</strong><br>
+      Con Luna in ${_escHoro(moon)} (${_escHoro(moonT)}) il sistema emotivo chiede: ${_escHoro(_signTraits(moon).toLowerCase())}.
+      È la chiave di come ti ricarichi e di cosa ti fa sentire a casa.
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">5. Ascendente · approccio e prima impressione</strong><br>
+      ${hasAsc
+        ? `Ascendente in ${_escHoro(asc)} (${_escHoro(ascT)}): il modo in cui entri nelle situazioni tende a ${_escHoro(_signTraits(asc).toLowerCase())}. È la “porta” del tema, non tutto il carattere.`
+        : 'Ascendente non calcolabile in modo affidabile senza ora e luogo precisi. Completa i dati di nascita per questa parte.'}
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">6. Aree di vita</strong><br>
+      <strong>Mente / comunicazione:</strong> ${_escHoro(areas.mind)}<br>
+      <strong>Affetti:</strong> ${_escHoro(areas.love)}<br>
+      <strong>Azione / lavoro:</strong> ${_escHoro(areas.work)}<br>
+      <strong>Crescita:</strong> ${_escHoro(areas.growth)}<br>
+      <strong>Impegni / struttura:</strong> ${_escHoro(areas.duty)}
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">7. Pianeti nel tema</strong><br>
+      ${planetLines.length ? planetLines.map(x => `• ${_escHoro(x)}`).join('<br>') : 'Dettaglio pianeti non disponibile.'}
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">8. Risorse e sfide</strong><br>
+      <strong>Risorse:</strong> ${_escHoro(strengths.join('; '))}.<br>
+      <strong>Sfide tipiche:</strong> ${_escHoro(challenges.join('; '))}.
+    </p>
+
+    <p style="margin:0 0 8px 0"><strong style="color:var(--text)">9. Consiglio pratico (5 punti)</strong></p>
+    <ol style="margin:0 0 10px 18px;padding:0">
+      ${tips.map(t => `<li style="margin-bottom:4px">${_escHoro(t)}</li>`).join('')}
+    </ol>
+
+    <p style="margin:0;font-size:.85em;opacity:.9">
+      Nota: testo generato da ChronoBirth con regole interpretative sui dati calcolati.
+      Per un approfondimento narrativo più libero puoi usare anche «Copia tema» e incollarlo su un’AI online.
+    </p>
+  `;
+
+  // plain text version for copy
+  const plain = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<\/?ol[^>]*>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return { html, plain };
+}
+
 function buildFullThemeText(r){
   const lines = [];
   lines.push('TEMA NATALE COMPLETO — ChronoBirth');
@@ -2636,6 +2806,7 @@ document.getElementById('btnCopy').onclick = ()=>{
   copyTextSmart(txt).then(ok => alert(ok ? "Riepilogo copiato!" : "Copia non riuscita"));
 };
 
+let lastGeneratedOroscopoPlain = '';
 const btnCopyTema = document.getElementById('btnCopyTema');
 if(btnCopyTema){
   btnCopyTema.onclick = async ()=>{
@@ -2647,9 +2818,40 @@ if(btnCopyTema){
     const ok = await copyTextSmart(txt);
     const hint = document.getElementById('copyTemaHint');
     if(hint) hint.textContent = ok
-      ? '✓ Copiato. Ora aprilo su internet (ChatGPT, Gemini, Claude…) e incolla il testo per l’oroscopo completo.'
+      ? '✓ Tema copiato. Incollalo su internet in un’AI online (ChatGPT, Gemini, Claude…) per un approfondimento esterno.'
       : 'Copia non riuscita. Seleziona e copia manualmente dal tema.';
-    if(ok) alert('Tema completo copiato (con Ascendente/MC).\n\nOra aprilo su internet in un’AI online (ChatGPT, Gemini, Claude, ecc.) e incolla il testo per ricevere l’interpretazione completa.');
+    if(ok) alert('Tema completo copiato (con Ascendente/MC).\n\nIncolla il testo su internet in un’AI online per un’interpretazione esterna.');
+  };
+}
+const btnGeneraOroscopo = document.getElementById('btnGeneraOroscopo');
+if(btnGeneraOroscopo){
+  btnGeneraOroscopo.onclick = ()=>{
+    if(!currentResult || !currentResult.zodiac){
+      alert('Prima premi «Calcola profilo completo».');
+      return;
+    }
+    const out = buildCompleteOroscopo(currentResult);
+    lastGeneratedOroscopoPlain = out.plain;
+    const box = document.getElementById('oroscopoCompletoBox');
+    const el = document.getElementById('oroscopoCompleto');
+    if(el) el.innerHTML = out.html;
+    if(box){
+      box.style.display = 'block';
+      box.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+    const hint = document.getElementById('copyTemaHint');
+    if(hint) hint.textContent = '✓ Oroscopo completo generato nell’app (Sole, Luna, Ascendente e pianeti).';
+  };
+}
+const btnCopyOroscopo = document.getElementById('btnCopyOroscopo');
+if(btnCopyOroscopo){
+  btnCopyOroscopo.onclick = async ()=>{
+    if(!lastGeneratedOroscopoPlain){
+      alert('Prima premi «Genera oroscopo completo».');
+      return;
+    }
+    const ok = await copyTextSmart(lastGeneratedOroscopoPlain);
+    alert(ok ? 'Oroscopo generato copiato.' : 'Copia non riuscita.');
   };
 }
 document.getElementById('btnShare').onclick = async ()=>{
@@ -3097,5 +3299,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 console.log('✅ ChronoBirth avviato con successo!');
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a37bdd0ce3edc0',t:'MTc4Mzg5NTMzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1a3a9e33f6fb5aa',t:'MTc4Mzg5NzIyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
